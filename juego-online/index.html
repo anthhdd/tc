@@ -455,51 +455,55 @@ window.addEventListener('tahu-avatar-loaded',e=>{
   const title=document.querySelector('#playerList header');
   if(title)title.textContent='Jugadores (1)';
  }
- // Aplicar la paleta real de cuerpo que devuelve el perfil público de Roblox.
+ // El modelo GLTF importado es un único mesh con textura de Noob: no admite
+ // recolorear por partes. Para que el avatar sí refleje el perfil, usamos el R6
+ // articulado del juego, que tiene materiales independientes para cada pieza.
  const appearance=data.appearance||{};
  const colors=appearance.bodyColors||{};
  const colorFor=id=>brickColors[Number(id)]||0xf0c18c;
  const setMat=(mat,id)=>{mat.color.setHex(colorFor(id));mat.needsUpdate=true;};
- setMat(skin,colors.headColorId);setMat(shirt,colors.torsoColorId);
+ const assets=Array.isArray(appearance.assets)?appearance.assets:[];
+ const assetType=a=>String(a.assetType?.name||'').toLowerCase();
+ const hasClassicShirt=assets.some(a=>assetType(a)==='shirt');
+ const hasClassicPants=assets.some(a=>assetType(a)==='pants');
+ setMat(skin,colors.headColorId);
+ setMat(shirt,hasClassicShirt?colors.torsoColorId:colors.torsoColorId);
+ setMat(pants,hasClassicPants?0x263c73:colors.leftLegColorId);
  const leftArmColor=colors.leftArmColorId??colors.rightArmColorId;
  const rightArmColor=colors.rightArmColorId??colors.leftArmColorId;
  const leftLegColor=colors.leftLegColorId??colors.rightLegColorId;
  const rightLegColor=colors.rightLegColorId??colors.leftLegColorId;
  const armLeft=leftArm.children.find(o=>o.isMesh),armRight=rightArm.children.find(o=>o.isMesh);
  const legLeft=leftLeg.children.find(o=>o.isMesh),legRight=rightLeg.children.find(o=>o.isMesh);
- if(armLeft){armLeft.material=skin.clone();armLeft.material.color.setHex(colorFor(leftArmColor));}
- if(armRight){armRight.material=skin.clone();armRight.material.color.setHex(colorFor(rightArmColor));}
- // La ropa clásica del avatar se refleja en las piezas R6; el perfil aporta los objetos y tipos.
- const assets=Array.isArray(appearance.assets)?appearance.assets:[];
- const clothing=assets.map(a=>(a.assetType&&a.assetType.name||'').toLowerCase());
- const hasClassicShirt=clothing.some(x=>x==='shirt');
- const hasClassicPants=clothing.some(x=>x==='pants');
- if(hasClassicShirt)shirt.color.setHex(0x777777);
- else setMat(shirt,colors.torsoColorId);
- if(hasClassicPants)pants.color.setHex(0x263c73);
- else {
-  if(legLeft){legLeft.material=skin.clone();legLeft.material.color.setHex(colorFor(leftLegColor));}
-  if(legRight){legRight.material=skin.clone();legRight.material.color.setHex(colorFor(rightLegColor));}
- }
+ if(armLeft){armLeft.material=(hasClassicShirt?shirt:skin).clone();if(!hasClassicShirt)armLeft.material.color.setHex(colorFor(leftArmColor));}
+ if(armRight){armRight.material=(hasClassicShirt?shirt:skin).clone();if(!hasClassicShirt)armRight.material.color.setHex(colorFor(rightArmColor));}
+ if(legLeft){legLeft.material=(hasClassicPants?pants:skin).clone();if(!hasClassicPants)legLeft.material.color.setHex(colorFor(leftLegColor));}
+ if(legRight){legRight.material=(hasClassicPants?pants:skin).clone();if(!hasClassicPants)legRight.material.color.setHex(colorFor(rightLegColor));}
  clearAccessories();
- const accessoryAssets=assets.filter(a=>/accessory|hat|hair|face/i.test((a.name||'')+' '+(a.assetType&&a.assetType.name||''))).slice(0,6);
+ const accessoryAssets=assets.filter(a=>/accessory|hat|hair|face/i.test((a.name||'')+' '+assetType(a))).slice(0,8);
  accessoryAssets.forEach((item,index)=>{
-  const type=((item.assetType&&item.assetType.name)||item.name||'').toLowerCase();
-  const color=[0x343434,0x3569a8,0x9b59b6,0xc17b35,0x2d9b78,0xc94b43][index%6];
+  const type=(assetType(item)+' '+(item.name||'')).toLowerCase();
+  const color=/hair/.test(type)?0x292522:[0x343434,0x3569a8,0x9b59b6,0xc17b35,0x2d9b78,0xc94b43][index%6];
   const mat=new THREE.MeshStandardMaterial({color,roughness:.82});
   let geometry;
-  if(/hair/.test(type))geometry=new THREE.BoxGeometry(.9,.35,.92);
-  else if(/hat|head/.test(type))geometry=new THREE.BoxGeometry(.95,.18,.95);
+  if(/hair/.test(type))geometry=new THREE.SphereGeometry(.5,12,8);
+  else if(/hat/.test(type))geometry=new THREE.CylinderGeometry(.52,.52,.2,12);
   else if(/shoulder/.test(type))geometry=new THREE.BoxGeometry(.34,.34,.34);
   else if(/back/.test(type))geometry=new THREE.BoxGeometry(.65,.85,.2);
+  else if(/face/.test(type))return;
   else geometry=new THREE.BoxGeometry(.32,.28,.28);
   const piece=new THREE.Mesh(geometry,mat);
+  if(/hair/.test(type))piece.scale.set(1.05,.72,1.02);
   if(/shoulder/.test(type))piece.position.set(index%2?-.78:.78,.18,0);
   else if(/back/.test(type))piece.position.set(0,.05,-.56);
   else piece.position.set(0,.58+(index===0?.12:0),0);
   piece.castShadow=true;accessoryGroup.add(piece);
  });
- avatar.visible=true;robloxAvatarLoaded=true;
+ // Mostrar el rig que acabamos de personalizar; el GLTF de Noob no tiene UVs
+ // de ropa Roblox ni partes separadas para aplicar los colores del usuario.
+ const imported=avatar.children.find(o=>o!==proceduralRig);
+ if(imported)imported.visible=false;
+ proceduralRig.visible=true;rigMixer=null;avatar.visible=true;robloxAvatarLoaded=true;
 });
 // Si el usuario cargó su avatar antes de que terminara de iniciar Three.js, aplícalo ahora.
 if(window.tahuAvatarData)window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
