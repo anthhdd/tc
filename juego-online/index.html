@@ -179,18 +179,12 @@ main{position:absolute;inset:0}
  let searchTimer=0,searchController=null,selectedUser=null,requestVersion=0;
  const cleanName=value=>value.trim().replace(/^@/,'');
  async function requestJson(path,options={}){
-  const hosts=['https://users.roproxy.com','https://avatar.roproxy.com','https://thumbnails.roproxy.com'];
-  const host=path.startsWith('/v1/usernames')||path.startsWith('/v1/users/search')?'https://users.roproxy.com':path.startsWith('/v4/avatar')?'https://avatar.roproxy.com':'https://thumbnails.roproxy.com';
-  const fallback=host.replace('.roproxy.com','.roblox.com');
-  let lastError;
-  for(const base of [host,fallback]){
-   try{
-    const response=await fetch(base+path,{...options,headers:{Accept:'application/json',...(options.headers||{})}});
-    if(!response.ok)throw new Error('HTTP '+response.status);
-    return await response.json();
-   }catch(error){lastError=error;}
-  }
-  throw lastError||new Error('No se pudo conectar con Roblox.');
+  // Roblox no habilita CORS para estas APIs. El proxy solo reenvía GET públicos.
+  if((options.method||'GET').toUpperCase()!=='GET')throw new Error('Esta consulta requiere GET.');
+  const url='https://proxy.cors.dev/https://'+(path.startsWith('/v4/avatar')?'avatar':path.startsWith('/v1/users/avatar')?'thumbnails':'users')+'.roblox.com'+path;
+  const response=await fetch(url,{method:'GET',signal:options.signal,headers:{Accept:'application/json'}});
+  if(!response.ok)throw new Error('El servicio de Roblox respondió HTTP '+response.status+'.');
+  return response.json();
  }
  function hideSuggestions(){suggestions.style.display='none';suggestions.replaceChildren();}
  function renderSuggestions(users){
@@ -231,15 +225,15 @@ main{position:absolute;inset:0}
    message.textContent='El usuario debe tener entre 3 y 20 caracteres: letras A-Z, números y _. Puedes escribir letras normalmente.';
    input.focus();return;
   }
-  const version=++requestVersion;load.disabled=true;load.textContent='BUSCANDO';message.textContent='Buscando el usuario exacto en Roblox…';
+  const version=++requestVersion;load.disabled=true;load.textContent='BUSCANDO';message.textContent='Buscando el nombre exacto en Roblox…';
   details.textContent='';preview.style.display='none';preview.removeAttribute('src');
   try{
    let user=preselected;
    if(!user||user.name.toLowerCase()!==username.toLowerCase()){
-    const result=await requestJson('/v1/usernames/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usernames:[username],excludeBannedUsers:false})});
+    const result=await requestJson('/v1/users/search?keyword='+encodeURIComponent(username)+'&limit=10');
     user=(result.data||[]).find(u=>(u.name||'').toLowerCase()===username.toLowerCase());
    }
-   if(!user)throw new Error('No existe el usuario exacto @'+username+'. Revisa las letras o elige una sugerencia.');
+   if(!user)throw new Error('No se encontró una coincidencia exacta para @'+username+'. Comprueba el nombre o elige una sugerencia.');
    const userId=user.id;
    const [appearanceResult,thumbResult]=await Promise.allSettled([
     requestJson('/v4/avatar/users/'+userId),
@@ -257,7 +251,7 @@ main{position:absolute;inset:0}
    message.textContent='Usuario verificado: @'+user.name+'. Aspecto R6 aproximado aplicado; el modelo 3D original de Roblox necesita una API key segura.';
    window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:data}));
   }catch(err){
-   if(version===requestVersion)message.textContent='No se pudo cargar: '+(err?.message||'error de conexión')+'. Prueba otra vez o elige una sugerencia.';
+   if(version===requestVersion)message.textContent='No se pudo cargar: '+(err?.message||'error de conexión')+'. Si el servicio proxy está temporalmente caído, inténtalo más tarde.';
   }finally{if(version===requestVersion){load.disabled=false;load.textContent='CARGAR';}}
  }
  form.addEventListener('submit',e=>{e.preventDefault();hideSuggestions();loadAvatar(selectedUser);});
