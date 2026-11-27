@@ -203,7 +203,7 @@ main{position:absolute;inset:0}
   const response=await fetch(url,{method:'GET',signal:options.signal,headers:{Accept:'application/json'}});
   if(response.status===429){
    const retry=response.headers.get('Retry-After');
-   const wait=retry&&/^\\d+$/.test(retry)?' Roblox pide esperar '+retry+' segundos.':'';
+   const wait=retry&&Number.isFinite(Number(retry))?' Roblox pide esperar '+retry+' segundos.':'';
    throw new Error('Roblox está limitando temporalmente las consultas (HTTP 429).'+wait+' Espera un poco antes de volver a intentarlo.');
   }
   if(!response.ok)throw new Error('El servicio de Roblox respondió HTTP '+response.status+'.');
