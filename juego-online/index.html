@@ -2,74 +2,185 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#111111">
 <link rel="icon" href="/tc/assets/icons/favicon.ico">
-<title>Juego online | Tahu De Chill</title>
+<title>Baseplate 3D | Tahu De Chill</title>
 <style>
-:root{--bg:#111;--orange:#ff9000;--line:#303030}
+:root{--orange:#ff9000;--dark:#111}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--bg);color:#f5f5f5;font:15px Arial,Helvetica,sans-serif;display:flex;flex-direction:column}
-header{min-height:68px;background:#080808;border-bottom:1px solid #292929;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px clamp(16px,4vw,58px)}
-.brand{font-size:25px;font-weight:900;letter-spacing:-1.3px;white-space:nowrap;color:white;text-decoration:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;color:#fff;font:14px Arial,Helvetica,sans-serif}
+body{display:flex;flex-direction:column}
+header{height:64px;flex:none;background:#080808;border-bottom:1px solid #292929;display:flex;align-items:center;gap:14px;padding:0 clamp(12px,3vw,42px);position:relative;z-index:5}
+.brand{font-size:23px;font-weight:900;letter-spacing:-1.3px;white-space:nowrap;color:white;text-decoration:none}
 .brand span{background:var(--orange);color:#111;padding:4px 6px;border-radius:5px;margin-left:2px}
-.account-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.nav-button{background:var(--orange);color:#111;text-decoration:none;font-weight:800;padding:10px 15px;border-radius:5px}
-main{flex:1;display:grid;place-items:center;padding:40px 20px}
-.panel{text-align:center;background:linear-gradient(135deg,#21170d,#171717 70%);border:1px solid #493015;border-radius:12px;padding:clamp(35px,7vw,70px);width:min(100%,760px);box-shadow:0 18px 60px #0005}
-h1{font-size:clamp(36px,6vw,58px);margin:0 0 18px;font-weight:900}
-h1 span{color:var(--orange)}
-p{font-size:19px;line-height:1.6;color:#bbb;margin:0}
-footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#777;font-size:12px}
-.login{background:#292929;color:#fff;border:1px solid #555}.signup{background:var(--orange);color:#111}
-
-/* Movimiento y acabado visual */
-body{background:radial-gradient(ellipse at 50% -25%,#38200b 0%,#17120e 28%,var(--bg) 68%);background-attachment:fixed}
-header{position:relative;z-index:2;backdrop-filter:blur(14px);box-shadow:0 8px 30px #0005;animation:header-in .65s cubic-bezier(.2,.8,.2,1) both}
-.brand{transition:transform .25s ease,filter .25s ease}
-.brand:hover{transform:translateY(-2px);filter:drop-shadow(0 0 12px #ff900077)}
-.nav-button{position:relative;overflow:hidden;transition:transform .22s ease,box-shadow .22s ease,background .22s ease}
-.nav-button:hover{transform:translateY(-3px);box-shadow:0 7px 22px #ff900044}
-.nav-button:active{transform:translateY(0) scale(.97)}
-main{animation:content-in .8s .12s cubic-bezier(.2,.8,.2,1) both}
-.panel,.welcome{position:relative;overflow:hidden;animation:panel-in .85s .18s cubic-bezier(.2,.8,.2,1) both;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
-.panel:hover,.welcome:hover{transform:translateY(-4px);border-color:#87501d;box-shadow:0 24px 70px #0008,0 0 35px #ff900010}
-.panel:before,.welcome:before{content:"";position:absolute;inset:-1px;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#ffb9000c 48%,transparent 70%);transform:translateX(-100%);animation:shine 5s 1.2s ease-in-out infinite}
-h1 span{ text-shadow:0 0 26px #ff900044 }
-footer{animation:fade-in .9s .35s both}
-.age-dialog{animation:panel-in .55s cubic-bezier(.2,.8,.2,1) both}
-.age-actions button{transition:transform .2s ease,filter .2s ease}
-.age-actions button:hover{transform:translateY(-2px);filter:brightness(1.12)}
-#site-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(ellipse at center,#241708 0%,#111 58%,#080808 100%);opacity:1;visibility:visible;transition:opacity .55s ease,visibility .55s ease}
-#site-loader.hide{opacity:0;visibility:hidden;pointer-events:none}
-.loader-inner{display:flex;flex-direction:column;align-items:center;gap:22px}
-.loader-logo{font-size:clamp(34px,7vw,48px);font-weight:950;letter-spacing:-2px;color:#fff;animation:logo-pulse 1.25s ease-in-out infinite}
-.loader-logo span{background:var(--orange);color:#111;padding:5px 8px;border-radius:7px;margin-left:3px}
-.loader-ring{width:48px;height:48px;border:3px solid #ffffff1a;border-top-color:var(--orange);border-right-color:#ffb900;border-radius:50%;animation:spin .8s linear infinite;box-shadow:0 0 24px #ff900033}
-.loader-caption{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#9a8b7b}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes logo-pulse{0%,100%{filter:drop-shadow(0 0 4px #ff900022);transform:scale(1)}50%{filter:drop-shadow(0 0 18px #ff900088);transform:scale(1.035)}}
-@keyframes header-in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes content-in{from{opacity:0}to{opacity:1}}
-@keyframes panel-in{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes fade-in{from{opacity:0}to{opacity:1}}
-@keyframes shine{0%,65%,100%{transform:translateX(-100%)}35%{transform:translateX(100%)}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
-
+.nav-button{background:var(--orange);color:#111;text-decoration:none;font-weight:800;padding:9px 14px;border-radius:5px;transition:.2s}
+.nav-button:hover{transform:translateY(-2px);box-shadow:0 6px 20px #ff900044}
+.account-actions{margin-left:auto;display:flex;gap:9px}.login{background:#292929;color:#fff;border:1px solid #555}
+main{position:relative;flex:1;min-height:0;background:#83c9ed}
+#game{position:absolute;inset:0;touch-action:none}
+#game canvas{display:block;width:100%;height:100%;outline:none}
+.hud{position:absolute;z-index:2;pointer-events:none;inset:14px 16px auto;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hud-card{background:#101820d9;border:1px solid #ffffff35;border-radius:10px;padding:10px 13px;box-shadow:0 5px 22px #0002;backdrop-filter:blur(8px)}
+.game-title{font-size:16px;font-weight:900}.game-title span{color:var(--orange)}
+.hint{margin-top:5px;color:#d4e4eb;font-size:12px;line-height:1.5}
+.status{font-size:12px;color:#e8f4fa;text-align:right}
+#help{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100% - 34px));padding:24px;text-align:center;background:#101820ed;border:1px solid #ffffff45;border-radius:16px;box-shadow:0 20px 70px #0005}
+#help h1{font-size:28px;margin:0 0 9px}#help h1 span{color:var(--orange)}
+#help p{color:#d2e0e7;line-height:1.55;margin:0 0 17px}
+#start{border:0;border-radius:8px;background:var(--orange);color:#111;font-size:15px;font-weight:900;padding:12px 24px;cursor:pointer}
+#start:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.controls{position:absolute;z-index:3;inset:auto 16px 16px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px);gap:6px;pointer-events:auto}
+.ctrl{border:1px solid #ffffff66;border-radius:12px;background:#101820a8;color:#fff;font-size:20px;font-weight:800;touch-action:none;user-select:none}
+.ctrl:active,.ctrl.down{background:#ff9000;color:#111}
+#forward{grid-column:2;grid-row:1}#left{grid-column:1;grid-row:2}#back{grid-column:2;grid-row:2}#right{grid-column:3;grid-row:2}
+#jump{width:66px;height:66px;border-radius:50%;pointer-events:auto;background:#ff9000;color:#111;border:2px solid #fff9;font-size:13px;font-weight:900}
+#toast{position:absolute;z-index:2;bottom:18px;left:50%;transform:translateX(-50%);padding:8px 12px;border-radius:8px;background:#101820b8;color:#e8f4fa;font-size:11px;pointer-events:none;white-space:nowrap}
+footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;color:#777;text-align:center;font-size:10px;padding:6px}
+@media(max-width:620px){header{height:auto;min-height:58px;gap:8px;flex-wrap:wrap;padding:8px 10px}.brand{font-size:19px}.nav-button{font-size:12px;padding:8px 9px}.account-actions{margin-left:auto}.hud{inset:9px 9px auto}.hud-card{padding:8px 10px}.hint{max-width:210px}.controls{inset:auto 12px 12px}.pad{grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,43px)}#jump{width:60px;height:60px}#toast{bottom:8px;font-size:10px}}
 </style>
 </head>
 <body>
-<div id="site-loader" role="status" aria-label="Cargando Tahu De Chill"><div class="loader-inner"><div class="loader-logo">tahu<span>de chill</span></div><div class="loader-ring"></div><div class="loader-caption">Preparando la diversión</div></div></div>
 <header>
 <a class="brand" href="../">tahu<span>de chill</span></a>
 <a class="nav-button" href="../games/">Juegos</a>
 <a class="nav-button" href="./">Juego online</a>
-
-<div class="account-actions"><a class="nav-button signup" href="../cuenta/">Crear cuenta</a><a class="nav-button login" href="../cuenta/">Iniciar sesión</a></div>
+<div class="account-actions"><a class="nav-button" href="../cuenta/">Crear cuenta</a><a class="nav-button login" href="../cuenta/">Iniciar sesión</a></div>
 </header>
-<main><section class="panel"><h1><span>Juego online</span></h1><p>¡Próximamente podrás jugar en línea desde Tahu De Chill!</p></section></main>
+<main>
+<div id="game" aria-label="Mundo 3D Baseplate"></div>
+<div class="hud">
+ <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
+ <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
+</div>
+<div id="help"><h1>Bienvenido a <span>Baseplate</span></h1><p>Un mundo 3D con avatar de bloques estilo R6. Muévete por la plataforma, salta y explora.</p><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra sobre el mundo para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
+<div class="controls">
+ <div class="pad">
+  <button class="ctrl" id="forward" aria-label="Adelante">▲</button>
+  <button class="ctrl" id="left" aria-label="Izquierda">◀</button>
+  <button class="ctrl" id="back" aria-label="Atrás">▼</button>
+  <button class="ctrl" id="right" aria-label="Derecha">▶</button>
+ </div>
+ <button class="ctrl" id="jump">SALTAR</button>
+</div>
+<div id="toast">Tahu De Chill · Baseplate clásica</div>
+</main>
 <footer>© 2026 Tahu De Chill</footer>
-<script>
-(()=>{const loader=document.getElementById('site-loader');if(!loader)return;const finish=()=>setTimeout(()=>loader.classList.add('hide'),650);if(document.readyState==='complete')finish();else window.addEventListener('load',finish,{once:true});})();
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const mount=document.getElementById('game');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
+scene.fog=new THREE.Fog(0x87ceeb,95,190);
+const camera=new THREE.PerspectiveCamera(65,1,.1,350);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+mount.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xdff4ff,0x71834d,2.1));
+const sun=new THREE.DirectionalLight(0xffffff,2.2);
+sun.position.set(-35,65,28);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;
+scene.add(sun);
+
+const baseMat=new THREE.MeshStandardMaterial({color:0x55a84b,roughness:1});
+const base=new THREE.Mesh(new THREE.BoxGeometry(160,.8,160),baseMat);
+base.position.y=-.4;base.receiveShadow=true;scene.add(base);
+const studGeo=new THREE.CylinderGeometry(.42,.42,.13,4);
+studGeo.rotateY(Math.PI/4);
+const studMat=new THREE.MeshStandardMaterial({color:0x64b957,roughness:1});
+const studs=new THREE.InstancedMesh(studGeo,studMat,400);
+const dummy=new THREE.Object3D();let n=0;
+for(let x=-72;x<=72;x+=8)for(let z=-72;z<=72;z+=8){dummy.position.set(x,.065,z);dummy.updateMatrix();studs.setMatrixAt(n++,dummy.matrix)}
+studs.count=n;studs.receiveShadow=true;scene.add(studs);
+const grid=new THREE.GridHelper(160,40,0x397d38,0x4c9444);grid.position.y=.008;scene.add(grid);
+
+// Avatar R6: cabeza, torso, dos brazos y dos piernas rígidos.
+const avatar=new THREE.Group();scene.add(avatar);
+const skin=new THREE.MeshStandardMaterial({color:0xf0c18c,roughness:.85});
+const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
+const pants=new THREE.MeshStandardMaterial({color:0x263c73,roughness:.95});
+const dark=new THREE.MeshStandardMaterial({color:0x242424,roughness:.9});
+function block(parent,w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+block(avatar,1.55,1.85,.78,shirt,0,2.65,0);
+block(avatar,1.05,1.05,1.02,skin,0,4.12,0);
+block(avatar,.12,.12,.04,dark,-.24,4.2,.53);
+block(avatar,.12,.12,.04,dark,.24,4.2,.53);
+block(avatar,.42,.09,.04,dark,0,3.88,.53);
+const leftArm=new THREE.Group();leftArm.position.set(-.98,3.35,0);avatar.add(leftArm);
+block(leftArm,.52,1.55,.58,skin,0,-.78,0);
+const rightArm=new THREE.Group();rightArm.position.set(.98,3.35,0);avatar.add(rightArm);
+block(rightArm,.52,1.55,.58,skin,0,-.78,0);
+const leftLeg=new THREE.Group();leftLeg.position.set(-.43,1.72,0);avatar.add(leftLeg);
+block(leftLeg,.62,1.65,.68,pants,0,-.78,0);
+block(leftLeg,.64,.28,.86,dark,0,-1.62,.08);
+const rightLeg=new THREE.Group();rightLeg.position.set(.43,1.72,0);avatar.add(rightLeg);
+block(rightLeg,.62,1.65,.68,pants,0,-.78,0);
+block(rightLeg,.64,.28,.86,dark,0,-1.62,.08);
+
+const spawnPad=new THREE.Mesh(new THREE.BoxGeometry(9,.18,9),new THREE.MeshStandardMaterial({color:0x777777,roughness:1}));
+spawnPad.position.set(0,.1,0);spawnPad.receiveShadow=true;scene.add(spawnPad);
+const spawnMark=new THREE.Mesh(new THREE.BoxGeometry(2,.04,2),new THREE.MeshStandardMaterial({color:0xff9000,emissive:0x552000}));
+spawnMark.position.set(0,.21,0);scene.add(spawnMark);
+
+const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.22,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0};
+const clock=new THREE.Clock();
+function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
+new ResizeObserver(resize).observe(mount);resize();
+
+function keyName(k){return k.toLowerCase()}
+window.addEventListener('keydown',e=>{const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
+window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
+function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
+document.getElementById('start').addEventListener('click',()=>{state.started=true;document.getElementById('help').style.display='none';renderer.domElement.focus()});
+document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
+for(const [id,key] of [['forward','w'],['back','s'],['left','a'],['right','d']]){
+ const el=document.getElementById(id);
+ el.addEventListener('pointerdown',e=>{e.preventDefault();state.touch[key]=true;el.classList.add('down');el.setPointerCapture(e.pointerId)});
+ const end=()=>{state.touch[key]=false;el.classList.remove('down')};
+ el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('lostpointercapture',end);
+}
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button===0){state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)}});
+renderer.domElement.addEventListener('pointermove',e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.camYaw-=dx*.006;state.camPitch=Math.max(-.05,Math.min(.8,state.camPitch+dy*.004))});
+renderer.domElement.addEventListener('pointerup',()=>state.drag=false);
+renderer.domElement.addEventListener('pointercancel',()=>state.drag=false);
+renderer.domElement.addEventListener('wheel',e=>{camera.userData.distance=Math.max(6,Math.min(18,(camera.userData.distance||10)+e.deltaY*.01))},{passive:true});
+camera.userData.distance=10;
+
+function update(dt){
+ if(!state.started)return;
+ const k=state.keys,t=state.touch;
+ const forward=Number(k.w||k.arrowup||t.w)-Number(k.s||k.arrowdown||t.s);
+ const side=Number(k.d||k.arrowright||t.d)-Number(k.a||k.arrowleft||t.a);
+ const moving=forward!==0||side!==0;
+ const length=Math.hypot(forward,side)||1;
+ const f=forward/length,s=side/length;
+ const angle=state.camYaw;
+ const dx=(Math.sin(angle)*f+Math.cos(angle)*s);
+ const dz=(-Math.cos(angle)*f+Math.sin(angle)*s);
+ const speed=9;
+ state.x+=dx*speed*dt;state.z+=dz*speed*dt;
+ state.x=THREE.MathUtils.clamp(state.x,-77,77);state.z=THREE.MathUtils.clamp(state.z,-77,77);
+ if(moving){state.yaw=Math.atan2(dx,dz);const swing=Math.sin(performance.now()*.012)*.65;leftLeg.rotation.x=swing;rightLeg.rotation.x=-swing;leftArm.rotation.x=-swing*.65;rightArm.rotation.x=swing*.65}
+ else{leftLeg.rotation.x*=.8;rightLeg.rotation.x*=.8;leftArm.rotation.x*=.8;rightArm.rotation.x*=.8}
+ state.vy-=25*dt;state.y+=state.vy*dt;
+ if(state.y<=0){state.y=0;state.vy=0;state.grounded=true}
+ avatar.position.set(state.x,state.y, state.z);avatar.rotation.y=state.yaw;
+ const dist=camera.userData.distance||10;
+ const target=new THREE.Vector3(state.x, state.y+2.7, state.z);
+ const horizontal=Math.cos(state.camPitch)*dist;
+ const desired=new THREE.Vector3(target.x+Math.sin(state.camYaw)*horizontal,target.y+Math.sin(state.camPitch)*dist+1.5,target.z+Math.cos(state.camYaw)*horizontal);
+ camera.position.lerp(desired,1-Math.pow(.001,dt));camera.lookAt(target);
+ document.getElementById('status').innerHTML='Modo 3D · Avatar R6<br>'+Math.round(state.x)+' , '+Math.round(state.z);
+}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
+animate();
 </script>
 </body>
 </html>
