@@ -247,7 +247,7 @@ for(let x=-72;x<=72;x+=8)for(let z=-72;z<=72;z+=8){dummy.position.set(x,.065,z);
 studs.count=n;studs.receiveShadow=true;scene.add(studs);
 const grid=new THREE.GridHelper(160,40,0x397d38,0x4c9444);grid.position.y=.008;scene.add(grid);
 
-// Avatar R6: cabeza, torso, dos brazos y dos piernas rígidos.
+// Personaje R6 3D articulado, construido con geometría (sin imagen del cuerpo).
 const avatar=new THREE.Group();scene.add(avatar);
 let robloxAvatarLoaded=false;
 let localPlayerName='Tú';
@@ -256,14 +256,16 @@ const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
 const pants=new THREE.MeshStandardMaterial({color:0x263c73,roughness:.95});
 const dark=new THREE.MeshStandardMaterial({color:0x242424,roughness:.9});
 function block(parent,w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
-block(avatar,1.55,1.85,.78,shirt,0,2.65,0);
-block(avatar,1.05,1.05,1.02,skin,0,4.12,0);
-block(avatar,.12,.12,.04,dark,-.24,4.2,.53);
-block(avatar,.12,.12,.04,dark,.24,4.2,.53);
-block(avatar,.42,.09,.04,dark,0,3.88,.53);
-const leftArm=new THREE.Group();leftArm.position.set(-.98,3.35,0);avatar.add(leftArm);
+const torsoRig=new THREE.Group();torsoRig.position.set(0,2.65,0);avatar.add(torsoRig);
+block(torsoRig,1.55,1.85,.78,shirt,0,0,0);
+const headRig=new THREE.Group();headRig.position.set(0,1.47,0);torsoRig.add(headRig);
+block(headRig,1.05,1.05,1.02,skin,0,0,0);
+block(headRig,.12,.12,.04,dark,-.24,.08,.53);
+block(headRig,.12,.12,.04,dark,.24,.08,.53);
+block(headRig,.42,.09,.04,dark,0,-.24,.53);
+const leftArm=new THREE.Group();leftArm.position.set(-.98,.70,0);torsoRig.add(leftArm);
 block(leftArm,.52,1.55,.58,skin,0,-.78,0);
-const rightArm=new THREE.Group();rightArm.position.set(.98,3.35,0);avatar.add(rightArm);
+const rightArm=new THREE.Group();rightArm.position.set(.98,.70,0);torsoRig.add(rightArm);
 block(rightArm,.52,1.55,.58,skin,0,-.78,0);
 const leftLeg=new THREE.Group();leftLeg.position.set(-.43,1.72,0);avatar.add(leftLeg);
 block(leftLeg,.62,1.65,.68,pants,0,-.78,0);
@@ -271,7 +273,7 @@ block(leftLeg,.64,.28,.86,dark,0,-1.62,.08);
 const rightLeg=new THREE.Group();rightLeg.position.set(.43,1.72,0);avatar.add(rightLeg);
 block(rightLeg,.62,1.65,.68,pants,0,-.78,0);
 block(rightLeg,.64,.28,.86,dark,0,-1.62,.08);
-
+let walkPhase=0,idlePhase=0;
 const spawnPad=new THREE.Mesh(new THREE.BoxGeometry(9,.18,9),new THREE.MeshStandardMaterial({color:0x777777,roughness:1}));
 spawnPad.position.set(0,.1,0);spawnPad.receiveShadow=true;scene.add(spawnPad);
 const spawnMark=new THREE.Mesh(new THREE.BoxGeometry(2,.04,2),new THREE.MeshStandardMaterial({color:0xff9000,emissive:0x552000}));
@@ -339,11 +341,22 @@ function update(dt){
  state.vz+=(dz*targetSpeed-state.vz)*Math.min(1,accel*dt);
  state.x+=state.vx*dt;state.z+=state.vz*dt;
  if(state.x<-77||state.x>77){state.x=THREE.MathUtils.clamp(state.x,-77,77);state.vx=0}if(state.z<-77||state.z>77){state.z=THREE.MathUtils.clamp(state.z,-77,77);state.vz=0}
- if(moving){state.yaw=Math.atan2(state.vx,state.vz);const swing=Math.sin(performance.now()*.012)*.65;leftLeg.rotation.x=swing;rightLeg.rotation.x=-swing;leftArm.rotation.x=-swing*.65;rightArm.rotation.x=swing*.65}
- else{leftLeg.rotation.x*=.8;rightLeg.rotation.x*=.8;leftArm.rotation.x*=.8;rightArm.rotation.x*=.8}
+ const horizontalSpeed=Math.hypot(state.vx,state.vz);
+ const walkBlend=THREE.MathUtils.clamp(horizontalSpeed/7,0,1);
+ if(horizontalSpeed>.15)state.yaw=Math.atan2(state.vx,state.vz);
+ walkPhase+=dt*(5.5+horizontalSpeed*1.05);idlePhase+=dt;
+ const stride=Math.sin(walkPhase)*.72*walkBlend;
+ const airborne=!state.grounded;
+ leftLeg.rotation.x=THREE.MathUtils.damp(leftLeg.rotation.x,airborne?-.28:stride,12,dt);
+ rightLeg.rotation.x=THREE.MathUtils.damp(rightLeg.rotation.x,airborne?-.28:-stride,12,dt);
+ leftArm.rotation.x=THREE.MathUtils.damp(leftArm.rotation.x,airborne?.85:-stride*.72,12,dt);
+ rightArm.rotation.x=THREE.MathUtils.damp(rightArm.rotation.x,airborne?.85:stride*.72,12,dt);
+ torsoRig.rotation.z=THREE.MathUtils.damp(torsoRig.rotation.z,Math.sin(walkPhase)*.045*walkBlend,8,dt);
+ torsoRig.position.y=2.65+(airborne?-.06:Math.abs(Math.sin(walkPhase*2))*.055*walkBlend+Math.sin(idlePhase*1.8)*.018*(1-walkBlend));
+ headRig.rotation.x=airborne?-.08:Math.sin(idlePhase*1.4)*.018;
  state.vy-=25*dt;state.y+=state.vy*dt;
  if(state.y<=0){state.y=0;state.vy=0;state.grounded=true}
- avatar.position.set(state.x,state.y, state.z);avatar.rotation.y=state.yaw;
+ avatar.position.set(state.x,state.y,state.z);avatar.rotation.y=state.yaw;
  const dist=camera.userData.distance||10;
  const target=new THREE.Vector3(state.x, state.y+2.7, state.z);
  const horizontal=Math.cos(state.camPitch)*dist;
