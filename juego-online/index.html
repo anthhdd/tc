@@ -335,6 +335,8 @@ window.addEventListener('tahu-avatar-loaded',e=>{
  avatar.visible=true;
  robloxAvatarLoaded=true;
 });
+// Si el usuario cargó su avatar antes de que terminara de iniciar Three.js, aplícalo ahora.
+if(window.tahuAvatarData)window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
 document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
 for(const [id,key] of [['forward','w'],['back','s'],['left','a'],['right','d']]){
  const el=document.getElementById(id);
