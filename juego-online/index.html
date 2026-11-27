@@ -244,8 +244,8 @@ main{position:absolute;inset:0}
    if(data.thumbnail){preview.src=data.thumbnail;preview.style.display='block';}
    const assets=appearance&&Array.isArray(appearance.assets)?appearance.assets:[];
    const names=assets.map(a=>a.name).filter(Boolean);
-   details.textContent=names.length?'Objetos equipados: '+names.slice(0,8).join(' · ')+(names.length>8?' · +'+(names.length-8)+' más':''):'Avatar identificado. Roblox no ha devuelto la lista de objetos.';
-   message.textContent='Usuario verificado: @'+user.name+'. Aplicando colores, ropa y accesorios disponibles…';
+   details.textContent=names.length?'Objetos del perfil: '+names.slice(0,8).join(' · ')+(names.length>8?' · +'+(names.length-8)+' más':''):'Avatar identificado. Roblox no ha devuelto la lista de objetos.';
+   message.textContent='Usuario verificado: @'+user.name+'. Aspecto R6 aproximado aplicado; el modelo 3D original de Roblox necesita una API key segura.';
    window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:data}));
   }catch(err){
    if(version===requestVersion)message.textContent='No se pudo cargar: '+(err?.message||'error de conexión')+'. Prueba otra vez o elige una sugerencia.';
@@ -318,7 +318,7 @@ const skin=new THREE.MeshStandardMaterial({color:0xf0c18c,roughness:.85});
 const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
 const pants=new THREE.MeshStandardMaterial({color:0x263c73,roughness:.95});
 const bodyMaterials={head:skin,torso:shirt,leftArm:skin,rightArm:skin,leftLeg:pants,rightLeg:pants};
-const brickColors={1:0xf2f3f3,2:0xa1a5a2,3:0x6d6e6c,5:0xd7c59a,11:0x80bbdb,21:0xc4281c,23:0xf5cd30,24:0xf5cd30,26:0x1b2a35,28:0x287f47,29:0xa1c48c,37:0x4b974b,38:0xa1c48c,45:0xb4d2e4,100:0xf8f8f8,101:0xcdcdcd,102:0x6d6e6c,104:0xdaa520,105:0xf5cd30,106:0xf8f8f8,107:0xe8bac8,108:0xd7c59a,110:0xeab892,111:0x694028,112:0x6b327c,113:0xe8bac8,115:0x6e99ca,116:0x4b974b,118:0xa1c48c,119:0x6b327c,120:0x6b327c,121:0x6b327c,123:0x6b327c,124:0x6b327c,125:0x6b327c,126:0x6b327c,127:0x6b327c,128:0x6b327c,131:0x80bbdb,133:0x74869d,134:0x74869d,135:0x74869d,136:0x74869d,137:0x74869d,138:0x74869d,140:0x74869d,141:0x74869d,143:0x74869d,145:0x74869d,146:0x74869d,147:0x74869d,148:0x74869d,149:0x74869d,150:0x74869d,151:0x74869d,153:0x74869d,154:0x74869d,157:0x74869d,158:0x74869d,168:0x74869d, 어:0x74869d};
+const brickColors={1:0xf2f3f3,2:0xa1a5a2,3:0x6d6e6c,5:0xd7c59a,11:0x80bbdb,21:0xc4281c,23:0xf5cd30,24:0xf5cd30,26:0x1b2a35,28:0x287f47,29:0xa1c48c,37:0x4b974b,38:0xa1c48c,45:0xb4d2e4,100:0xf8f8f8,101:0xcdcdcd,102:0x6d6e6c,104:0xdaa520,105:0xf5cd30,106:0xf8f8f8,107:0xe8bac8,108:0xd7c59a,110:0xeab892,111:0x694028,112:0x6b327c,113:0xe8bac8,115:0x6e99ca,116:0x4b974b,118:0xa1c48c,119:0x6b327c,120:0x6b327c,121:0x6b327c,123:0x6b327c,124:0x6b327c,125:0x6b327c,126:0x6b327c,127:0x6b327c,128:0x6b327c,131:0x80bbdb,133:0x74869d,134:0x74869d,135:0x74869d,136:0x74869d,137:0x74869d,138:0x74869d,140:0x74869d,141:0x74869d,143:0x74869d,145:0x74869d,146:0x74869d,147:0x74869d,148:0x74869d,149:0x74869d,150:0x74869d,151:0x74869d,153:0x74869d,154:0x74869d,157:0x74869d,158:0x74869d,168:0x74869d};
 const dark=new THREE.MeshStandardMaterial({color:0x242424,roughness:.9});
 function block(parent,w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
 const torsoRig=new THREE.Group();torsoRig.position.set(0,2.65,0);avatar.add(torsoRig);
@@ -413,8 +413,6 @@ window.addEventListener('tahu-avatar-loaded',e=>{
   else piece.position.set(0,.58+(index===0?.12:0),0);
   piece.castShadow=true;accessoryGroup.add(piece);
  });
- const scale=appearance.scales||{};
- if(scale.height)avatar.scale.y=THREE.MathUtils.clamp(Number(scale.height),.85,1.15);
  avatar.visible=true;robloxAvatarLoaded=true;
 });
 // Si el usuario cargó su avatar antes de que terminara de iniciar Three.js, aplícalo ahora.
