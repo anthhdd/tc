@@ -40,6 +40,24 @@ main{position:relative;isolation:isolate;flex:1;min-height:0;background:#83c9ed}
 #toast{position:absolute;z-index:2;bottom:18px;left:50%;transform:translateX(-50%);padding:8px 12px;border-radius:8px;background:#101820b8;color:#e8f4fa;font-size:11px;pointer-events:none;white-space:nowrap}
 footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;color:#777;text-align:center;font-size:10px;padding:6px}
 @media(max-width:620px){header{height:auto;min-height:58px;gap:8px;flex-wrap:wrap;padding:8px 10px}.brand{font-size:19px}.nav-button{font-size:12px;padding:8px 9px}.account-actions{margin-left:auto}.hud{inset:9px 9px auto}.hud-card{padding:8px 10px}.hint{max-width:210px}.controls{inset:auto 12px 12px}.pad{grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,43px)}#jump{width:60px;height:60px}#toast{bottom:8px;font-size:10px}}
+
+/* Interfaz clásica inspirada en Roblox 2016 */
+#classicChat{position:absolute;z-index:12;left:16px;bottom:16px;width:min(330px,calc(100% - 32px));background:#e8e8e8;color:#222;border:2px solid #777;border-radius:3px;box-shadow:0 4px 18px #0005;font:12px Arial,sans-serif;pointer-events:auto}
+#classicChat .chatHead{height:28px;background:linear-gradient(#fafafa,#d2d2d2);border-bottom:1px solid #999;padding:7px 9px;font-weight:bold;display:flex;justify-content:space-between}
+#classicChat .chatHead small{font-weight:normal;color:#666}
+#chatLog{height:132px;overflow:auto;padding:7px;background:#f7f7f7;line-height:1.45}
+.chatLine{overflow-wrap:anywhere;margin:0 0 3px}.chatLine b{color:#245b9b}
+#chatForm{display:flex;padding:6px;gap:5px;border-top:1px solid #bbb;background:#ddd}
+#chatInput{min-width:0;flex:1;padding:7px;border:1px solid #999;border-radius:2px;background:white;color:#222;font:12px Arial}
+#chatSend{border:1px solid #777;border-radius:2px;background:linear-gradient(#fff,#ccc);padding:0 11px;color:#222;font-weight:bold;cursor:pointer}
+#chatNotice{padding:3px 7px;color:#666;background:#eee;border-top:1px solid #ccc;font-size:10px}
+#playerList{position:absolute;z-index:11;right:16px;top:82px;width:150px;background:#e8e8e8;color:#222;border:2px solid #777;box-shadow:0 4px 18px #0003;font:12px Arial}
+#playerList header{height:25px;min-height:0;padding:5px 7px;background:linear-gradient(#fafafa,#d2d2d2);border:0;color:#222;font:bold 12px Arial}
+#playerEntry{padding:8px;border-top:1px solid #bbb;background:#f7f7f7}
+#playerEntry:before{content:"●";color:#35a853;margin-right:6px}
+#chatToggle{position:absolute;z-index:13;left:16px;bottom:16px;border:1px solid #777;border-radius:3px;background:linear-gradient(#fff,#ccc);color:#222;padding:8px 13px;font-weight:bold;pointer-events:auto;display:none}
+@media(max-width:620px){#classicChat{bottom:112px;left:10px;width:min(300px,calc(100% - 20px))}#playerList{right:10px;top:72px;width:122px}#chatToggle{left:10px;bottom:112px}}
+
 </style>
 </head>
 <body>
@@ -66,6 +84,15 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
  <button class="ctrl" id="jump">SALTAR</button>
 </div>
 <div id="toast">Tahu De Chill · Baseplate clásica</div>
+
+<div id="playerList"><header>Jugadores (1)</header><div id="playerEntry">Tú</div></div>
+<section id="classicChat" aria-label="Chat clásico">
+ <div class="chatHead"><span>Chat</span><small>estilo 2016</small></div>
+ <div id="chatLog" aria-live="polite"><div class="chatLine"><b>[Sistema]:</b> ¡Bienvenido a Tahu Baseplate!</div><div class="chatLine"><b>[Sistema]:</b> Escribe para probar el chat.</div></div>
+ <form id="chatForm"><input id="chatInput" maxlength="180" autocomplete="off" placeholder="Haz clic aquí para chatear..." aria-label="Mensaje de chat"><button id="chatSend" type="submit">Enviar</button></form>
+ <div id="chatNotice">Chat de prueba local · no conectado a otros jugadores</div>
+</section>
+
 </main>
 <footer>© 2026 Tahu De Chill</footer>
 <script>
@@ -239,5 +266,12 @@ function update(dt){
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
 animate();
 </script>
+
+<script>
+(()=>{const form=document.getElementById('chatForm'),input=document.getElementById('chatInput'),log=document.getElementById('chatLog');if(!form)return;
+form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;const line=document.createElement('div');line.className='chatLine';const name=document.createElement('b');name.textContent='[Tú]: ';line.append(name,document.createTextNode(value));log.appendChild(line);log.scrollTop=log.scrollHeight;input.value='';});
+})();
+</script>
+
 </body>
 </html>
