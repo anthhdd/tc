@@ -91,7 +91,14 @@ main{position:absolute;inset:0}
 #classicTop{height:36px;background:linear-gradient(#f7f7f7,#d9d9d9);border-bottom:1px solid #999;color:#333;box-shadow:0 1px 3px #0003;pointer-events:auto;padding:0 8px;gap:6px}
 #classicTop .coreBtn{height:26px;min-width:30px;border:1px solid #aaa;border-radius:3px;background:linear-gradient(#fff,#ddd);color:#333;font: bold 13px Arial;padding:0 9px;cursor:pointer}
 #classicTop .coreBrand{font-weight:bold;font-size:12px;color:#444;margin-left:4px}
-#classicTop .corePlace{font-weight:normal;color:#777;margin-left:8px;font-size:12px}
+#classicTop .corePlace{font-weight:normal;color:#666;margin-left:8px;font-size:12px}
+#classicTop .coreBtn{transition:background .12s,border-color .12s}
+#classicTop .coreBtn:hover{background:linear-gradient(#fff,#c8d8e8);border-color:#6b91b8}
+#classicTop .coreBtn:active{background:#b8cce0;box-shadow:inset 0 1px 3px #0003}
+#coreMenuPanel{border-radius:2px;box-shadow:0 3px 12px #0004}
+#coreMenuPanel button:focus-visible{outline:2px solid #06c;outline-offset:-2px}
+#playerList header{font-weight:700}
+#classicChat .chatHead{font-weight:700}
 #playerList{top:43px;right:8px;width:190px;background:rgba(245,245,245,.94);border:1px solid #aaa;border-radius:2px;box-shadow:0 1px 4px #0003}
 #playerList header{display:block;height:auto;min-height:26px;padding:6px 9px;background:linear-gradient(#fafafa,#ddd);border-bottom:1px solid #bbb;color:#333;font:bold 12px Arial}
 #playerEntry{background:rgba(255,255,255,.92);padding:7px 9px;color:#333}
@@ -142,7 +149,7 @@ main{position:absolute;inset:0}
 </header>
 <main>
 <div id="game" aria-label="Mundo 3D Baseplate"></div>
-<div id="classicTop"><button class="coreBtn" id="coreMenu" type="button" aria-label="Menú">☰</button><button class="coreBtn" id="coreReset" type="button">Reiniciar</button><span class="coreBrand">TAHU DE CHILL</span><span class="corePlace">Baseplate</span></div>
+<div id="classicTop"><button class="coreBtn" id="coreMenu" type="button" aria-label="Menú">☰</button><button class="coreBtn" id="coreReset" type="button">Reiniciar</button><span class="coreBrand">ROBLOX</span><span class="corePlace">Tahu De Chill · Baseplate</span></div>
 <div id="coreMenuPanel" role="menu"><div class="menuCaption">Menú del juego</div><button type="button" id="menuResume">▶ Continuar</button><button type="button" id="menuChat">☷ Mostrar / ocultar chat</button><button type="button" id="menuPlayers">♟ Mostrar / ocultar jugadores</button><button type="button" id="menuReset">↻ Reiniciar personaje</button><button type="button" id="menuAvatar">☺ Cambiar avatar</button></div>
 <div class="hud">
  <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Shift: correr · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
@@ -261,6 +268,7 @@ main{position:absolute;inset:0}
  });
 })();
 </script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <script type="module">
 let THREE;
 try { THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
@@ -275,6 +283,7 @@ catch(firstError) {
  }
 }
 
+const {GLTFLoader}=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
 const mount=document.getElementById('game');
 const startButton=document.getElementById('start');
 
@@ -315,7 +324,26 @@ const grid=new THREE.GridHelper(160,40,0x397d38,0x4c9444);grid.position.y=.008;s
 
 // Personaje R6 3D articulado, construido con geometría (sin imagen del cuerpo).
 const avatar=new THREE.Group();scene.add(avatar);
+const proceduralRig=new THREE.Group();avatar.add(proceduralRig);
 let robloxAvatarLoaded=false;
+let rigMixer=null,rigActions={},activeRigAction=null;
+function playRigAnimation(name){const next=rigActions[name];if(!next||activeRigAction===next)return;if(activeRigAction)activeRigAction.fadeOut(.16);next.reset().fadeIn(.16).play();activeRigAction=next;}
+const rigLoader=new GLTFLoader();
+rigLoader.load(new URL("./assets/models/r6-2017/scene.gltf",import.meta.url).href,gltf=>{
+ const importedRig=gltf.scene;
+ importedRig.scale.setScalar(.88);
+ importedRig.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+ avatar.add(importedRig);
+ proceduralRig.visible=false;
+ rigMixer=new THREE.AnimationMixer(importedRig);
+ for(const clip of gltf.animations){
+  const key=clip.name.split("|").pop();
+  rigActions[key]=rigMixer.clipAction(clip);
+  if(key==="Idle")rigActions[key].play();
+ }
+ activeRigAction=rigActions.Idle||null;
+ const status=document.getElementById("status");if(status)status.textContent="R6 2017 · Animaciones cargadas";
+},undefined,error=>{console.warn("No se pudo cargar el rig R6 2017",error);const status=document.getElementById("status");if(status)status.textContent="R6 clásico · modelo alternativo";});
 let localPlayerName='Tú';
 const skin=new THREE.MeshStandardMaterial({color:0xf0c18c,roughness:.85});
 const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
@@ -324,7 +352,7 @@ const bodyMaterials={head:skin,torso:shirt,leftArm:skin,rightArm:skin,leftLeg:pa
 const brickColors={1:0xf2f3f3,2:0xa1a5a2,3:0x6d6e6c,5:0xd7c59a,11:0x80bbdb,21:0xc4281c,23:0xf5cd30,24:0xf5cd30,26:0x1b2a35,28:0x287f47,29:0xa1c48c,37:0x4b974b,38:0xa1c48c,45:0xb4d2e4,100:0xf8f8f8,101:0xcdcdcd,102:0x6d6e6c,104:0xdaa520,105:0xf5cd30,106:0xf8f8f8,107:0xe8bac8,108:0xd7c59a,110:0xeab892,111:0x694028,112:0x6b327c,113:0xe8bac8,115:0x6e99ca,116:0x4b974b,118:0xa1c48c,119:0x6b327c,120:0x6b327c,121:0x6b327c,123:0x6b327c,124:0x6b327c,125:0x6b327c,126:0x6b327c,127:0x6b327c,128:0x6b327c,131:0x80bbdb,133:0x74869d,134:0x74869d,135:0x74869d,136:0x74869d,137:0x74869d,138:0x74869d,140:0x74869d,141:0x74869d,143:0x74869d,145:0x74869d,146:0x74869d,147:0x74869d,148:0x74869d,149:0x74869d,150:0x74869d,151:0x74869d,153:0x74869d,154:0x74869d,157:0x74869d,158:0x74869d,168:0x74869d};
 const dark=new THREE.MeshStandardMaterial({color:0x242424,roughness:.9});
 function block(parent,w,h,d,mat,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
-const torsoRig=new THREE.Group();torsoRig.position.set(0,2.65,0);avatar.add(torsoRig);
+const torsoRig=new THREE.Group();torsoRig.position.set(0,2.65,0);proceduralRig.add(torsoRig);
 block(torsoRig,1.55,1.85,.78,shirt,0,0,0);
 const headRig=new THREE.Group();headRig.position.set(0,1.47,0);torsoRig.add(headRig);
 block(headRig,1.05,1.05,1.02,skin,0,0,0);
@@ -335,10 +363,10 @@ const leftArm=new THREE.Group();leftArm.position.set(-.98,.70,0);torsoRig.add(le
 block(leftArm,.52,1.55,.58,skin,0,-.78,0);
 const rightArm=new THREE.Group();rightArm.position.set(.98,.70,0);torsoRig.add(rightArm);
 block(rightArm,.52,1.55,.58,skin,0,-.78,0);
-const leftLeg=new THREE.Group();leftLeg.position.set(-.43,1.72,0);avatar.add(leftLeg);
+const leftLeg=new THREE.Group();leftLeg.position.set(-.43,1.72,0);proceduralRig.add(leftLeg);
 block(leftLeg,.62,1.65,.68,pants,0,-.78,0);
 block(leftLeg,.64,.28,.86,dark,0,-1.62,.08);
-const rightLeg=new THREE.Group();rightLeg.position.set(.43,1.72,0);avatar.add(rightLeg);
+const rightLeg=new THREE.Group();rightLeg.position.set(.43,1.72,0);proceduralRig.add(rightLeg);
 block(rightLeg,.62,1.65,.68,pants,0,-.78,0);
 block(rightLeg,.64,.28,.86,dark,0,-1.62,.08);
 let walkPhase=0,idlePhase=0,landPulse=0,previousAirborne=false;
@@ -367,7 +395,7 @@ new ResizeObserver(resize).observe(mount);resize();
 // La cámara ya muestra el avatar desde la primera imagen, incluso antes de pulsar JUGAR.
 
 function keyName(k){return k.toLowerCase()}
-window.addEventListener('keydown',e=>{if(e.target&&(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable))return;const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
+window.addEventListener('keydown',e=>{if(e.key==="Escape"){corePanel.style.display=corePanel.style.display==="block"?"none":"block";return;}if(e.target&&(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable))return;const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
 window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
 window.addEventListener('blur',()=>{state.keys={};state.touch={};state.drag=false;});
 function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
@@ -490,6 +518,7 @@ function update(dt){
  const airborne=!state.grounded;
  const rising=airborne&&state.vy>1.2;
  const falling=airborne&&state.vy<=1.2;
+ if(!rigMixer){
  const stride=Math.sin(walkPhase)*(0.72+runBlend*.18)*walkBlend;
  // Ciclo R6: brazos opuestos, cadera alterna y balanceo del torso.
  const legTarget=airborne?(rising?-.34:.62):stride;
@@ -504,6 +533,8 @@ function update(dt){
  torsoRig.rotation.x=smooth(torsoRig.rotation.x,airborne?(rising?-.10:.12):-.035*walkBlend,9,dt);
  torsoRig.position.y=2.65+(airborne?-.07:Math.abs(Math.sin(walkPhase*2))*(.045+runBlend*.035)*walkBlend+Math.sin(idlePhase*1.8)*.018*(1-walkBlend));
  headRig.rotation.x=smooth(headRig.rotation.x,airborne?(rising?-.08:.10):Math.sin(idlePhase*1.4)*.018,8,dt);
+ }
+ if(rigMixer){const clip=airborne?(rising?"Jump":"Fall"):(horizontalSpeed>.35?(running?"RunAnim":"WalkAnim"):"Idle");playRigAnimation(rigActions[clip]?clip:(horizontalSpeed>.35?"WalkAnim":"Idle"));rigMixer.update(dt);}
  if(previousAirborne&&!airborne)landPulse=.16;
  previousAirborne=airborne;
  landPulse=Math.max(0,landPulse-dt);
