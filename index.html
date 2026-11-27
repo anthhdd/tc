@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111111">
-<title>OrangeTube — Vídeos para descubrir</title>
+<title>Tahu De Chill</title>
 <style>
-:root{--bg:#111;--panel:#1b1b1b;--panel2:#242424;--muted:#aaa;--orange:#ff9000;--yellow:#ffb900;--line:#303030}
+:root{--bg:#111;--panel:#1b1b1b;--muted:#aaa;--orange:#ff9000;--yellow:#ffb900;--line:#303030}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f5f5;font:15px Arial,Helvetica,sans-serif}
 header{height:68px;background:#080808;border-bottom:1px solid #292929;display:flex;align-items:center;gap:26px;padding:0 clamp(16px,4vw,58px);position:sticky;top:0;z-index:5}
 .brand{font-size:25px;font-weight:900;letter-spacing:-1.3px;white-space:nowrap;color:white}.brand span{background:var(--orange);color:#111;padding:4px 6px;border-radius:5px;margin-left:2px}
@@ -30,7 +30,7 @@ footer{border-top:1px solid var(--line);padding:25px clamp(16px,4vw,58px);color:
 </head>
 <body>
 <header>
-  <a class="brand" href="#" aria-label="OrangeTube inicio" style="text-decoration:none">orange<span>tube</span></a>
+  <a class="brand" href="#" aria-label="Tahu De Chill inicio" style="text-decoration:none">tahu<span>de chill</span></a>
   <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Buscar vídeos, canales..." aria-label="Buscar"><button aria-label="Buscar">⌕</button></form>
   <div class="header-actions"><button class="ghost" onclick="alert('Inicia sesión para continuar')">Iniciar sesión</button><button class="upload" onclick="alert('La función de subir vídeos estará disponible próximamente')">＋ Subir</button></div>
 </header>
@@ -38,7 +38,7 @@ footer{border-top:1px solid var(--line);padding:25px clamp(16px,4vw,58px);color:
   <a href="#" class="active" data-category="Todos">Para ti</a><a href="#" data-category="Popular">Popular</a><a href="#" data-category="Nuevos">Nuevos</a><a href="#" data-category="Tendencias">Tendencias</a><a href="#" data-category="Música">Música</a><a href="#" data-category="Deportes">Deportes</a><a href="#" data-category="Gaming">Gaming</a><a href="#" data-category="Lifestyle">Lifestyle</a>
 </nav>
 <main>
-  <section class="hero"><div><h1>Descubre algo nuevo cada día</h1><p>Explora vídeos populares, creadores y contenido destacado en <strong>OrangeTube</strong>.</p></div><span class="tag">✦ TU CONTENIDO, A TU MANERA</span></section>
+  <section class="hero"><div><h1>Bienvenido a Tahu De Chill</h1><p>Explora vídeos populares, creadores y contenido destacado en <strong>Tahu De Chill</strong>.</p></div><span class="tag">✦ TU CONTENIDO, A TU MANERA</span></section>
   <div class="section-head"><h2 id="sectionTitle">Vídeos recomendados</h2><a href="#" id="sortLink">Ver todos →</a></div>
   <section class="grid" id="videoGrid">
     <article class="video" data-title="aventura al aire libre naturaleza" data-category="Popular"><div class="thumb"><span class="quality">4K</span><span class="play">▶</span><span class="duration">12:48</span></div><div class="info"><div class="avatar">A</div><div class="meta"><h3>Una aventura increíble al aire libre</h3><p>Canal Aventura</p><p class="views">1,2 M visualizaciones · hace 2 días</p></div></div></article>
@@ -52,7 +52,7 @@ footer{border-top:1px solid var(--line);padding:25px clamp(16px,4vw,58px);color:
     <div class="empty" id="emptyState">No se han encontrado vídeos. Prueba con otra búsqueda.</div>
   </section>
 </main>
-<footer><span>© 2026 OrangeTube. Proyecto de demostración.</span><span><a href="#">Acerca de</a><a href="#">Privacidad</a><a href="#">Contacto</a></span></footer>
+<footer><span>© 2026 Tahu De Chill. Proyecto de demostración.</span><span><a href="#">Acerca de</a><a href="#">Privacidad</a><a href="#">Contacto</a></span></footer>
 <script>
 const cards=[...document.querySelectorAll('.video')], input=document.getElementById('searchInput'), empty=document.getElementById('emptyState'), title=document.getElementById('sectionTitle');let category='Todos';
 function filter(){const q=input.value.toLocaleLowerCase('es');let shown=0;cards.forEach(card=>{const matchText=card.dataset.title.includes(q)||card.innerText.toLocaleLowerCase('es').includes(q);const matchCat=category==='Todos'||category==='Para ti'||card.dataset.category===category;card.style.display=matchText&&matchCat?'':'none';if(matchText&&matchCat)shown++});empty.style.display=shown?'none':'block';title.textContent=category==='Todos'?'Vídeos recomendados':category}
