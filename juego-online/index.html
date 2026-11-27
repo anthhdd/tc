@@ -111,6 +111,7 @@ main{position:absolute;inset:0}
 #help h1,#help p{color:#333}
 #help h1 span{color:#e77b00}
 #help #avatarMessage{color:#555}
+.rig-credit{font-size:10px!important;color:#666!important;margin:7px auto!important}.rig-credit a{color:#245b9b;text-decoration:underline}
 #avatarType{display:inline-block;margin:4px auto 10px;padding:5px 10px;background:#ddd;border:1px solid #aaa;color:#444;font:bold 11px Arial;letter-spacing:.3px}
 #robloxUser{background:#fff;color:#222;border:1px solid #999}
 #loadAvatar{background:linear-gradient(#fff,#ddd);border:1px solid #999;color:#333}
@@ -155,7 +156,7 @@ main{position:absolute;inset:0}
  <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Shift: correr · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
  <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
 </div>
-<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="20" enterkeyhint="go" autocorrect="off" data-lpignore="true" placeholder="Usuario (ej. Builderman)" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><div id="userSuggestions" role="listbox" aria-label="Usuarios encontrados"></div><img id="robloxPreview" alt="Avatar de Roblox" /><div id="avatarType">AVATAR ROBLOX · R6</div><div id="avatarDetails"></div><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> caminar · <strong>SHIFT</strong> correr · <strong>ESPACIO</strong> saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
+<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="20" enterkeyhint="go" autocorrect="off" data-lpignore="true" placeholder="Usuario (ej. Builderman)" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><div id="userSuggestions" role="listbox" aria-label="Usuarios encontrados"></div><img id="robloxPreview" alt="Avatar de Roblox" /><div id="avatarType">AVATAR ROBLOX · R6</div><div id="avatarDetails"></div><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p class="rig-credit">Modelo R6 basado en <a href="https://sketchfab.com/3d-models/r6-roblox-noob-animated-cbb77281a5164ef4ac519df5fab9373e" target="_blank" rel="noopener">R6 Roblox Noob [Animated]</a> de Fog · CC BY 4.0</p><p><strong>WASD</strong> caminar · <strong>SHIFT</strong> correr · <strong>ESPACIO</strong> saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
 <div class="controls">
  <div class="pad">
   <button class="ctrl" id="forward" aria-label="Adelante">▲</button>
@@ -414,9 +415,9 @@ function showHeadBubble(message){
  ctx.beginPath();ctx.moveTo(218,top+boxH-2);ctx.lineTo(244,top+boxH+18);ctx.lineTo(268,top+boxH-2);ctx.closePath();ctx.fill();ctx.stroke();
  ctx.fillStyle='#222';ctx.textAlign='center';ctx.textBaseline='middle';shown.forEach((text,i)=>ctx.fillText(text,256,top+20+i*37,450));
  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
- if(bubbleSprite){headRig.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();}
+ if(bubbleSprite){avatar.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();}
  bubbleSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false}));
- bubbleSprite.position.set(0,1.55,0);bubbleSprite.scale.set(3.35,1.25,1);bubbleSprite.renderOrder=10;headRig.add(bubbleSprite);bubbleUntil=performance.now()+4200;
+ bubbleSprite.position.set(0,5.35,0);bubbleSprite.scale.set(3.35,1.25,1);bubbleSprite.renderOrder=10;avatar.add(bubbleSprite);bubbleUntil=performance.now()+4200;
 }
 window.addEventListener('tahu-chat-message',e=>showHeadBubble(e.detail?.text||''));
 function clearAccessories(){while(accessoryGroup.children.length){const child=accessoryGroup.children[0];accessoryGroup.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}})}}
@@ -554,7 +555,7 @@ function update(dt){
  const motionLabel=airborne?(rising?'Saltando':'Cayendo'):(horizontalSpeed>.35?(running?'Corriendo':'Caminando'):'En reposo');
  document.getElementById('status').textContent=localPlayerName+' · R6 · '+motionLabel;
 }
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);if(bubbleSprite&&performance.now()>bubbleUntil){headRig.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();bubbleSprite=null;}renderer.render(scene,camera)}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);if(bubbleSprite&&performance.now()>bubbleUntil){avatar.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();bubbleSprite=null;}renderer.render(scene,camera)}
 animate();
 </script>
 
