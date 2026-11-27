@@ -311,7 +311,7 @@ window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
 window.addEventListener('blur',()=>{state.keys={};state.touch={};state.drag=false;});
 function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
 const accessoryGroup=new THREE.Group();headRig.add(accessoryGroup);
-function clearAccessories(){while(accessoryGroup.children.length){const child=accessoryGroup.children.pop();accessoryGroup.remove(child);child.traverse?.(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()})}}
+function clearAccessories(){while(accessoryGroup.children.length){const child=accessoryGroup.children[0];accessoryGroup.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}})}}
 window.addEventListener('tahu-avatar-loaded',e=>{
  const data=e.detail||{};
  if(data.userName){
@@ -321,18 +321,7 @@ window.addEventListener('tahu-avatar-loaded',e=>{
   const title=document.querySelector('#playerList header');
   if(title)title.textContent='Jugadores (1)';
  }
- // La miniatura oficial sirve de referencia visual; el personaje jugable sigue siendo R6 articulado.
- if(data.thumbnail){
-  const loader=new THREE.TextureLoader();
-  loader.load(data.thumbnail,texture=>{
-   texture.colorSpace=THREE.SRGBColorSpace;
-   const portraitMat=new THREE.MeshBasicMaterial({map:texture,transparent:true,side:THREE.DoubleSide});
-   const portrait=new THREE.Mesh(new THREE.PlaneGeometry(1.05,1.05),portraitMat);
-   portrait.position.set(0,0,.525);headRig.add(portrait);
-   if(headRig.userData.portrait){headRig.remove(headRig.userData.portrait);headRig.userData.portrait.geometry.dispose();headRig.userData.portrait.material.map?.dispose();headRig.userData.portrait.material.dispose();}
-   headRig.userData.portrait=portrait;
-  });
- }
+ // La miniatura oficial se muestra en el selector; el personaje 3D conserva su rig R6.
  // Accesorios reales detectados en el perfil: se representan con piezas 3D sencillas.
  clearAccessories();
  const assets=data.appearance&&Array.isArray(data.appearance.assets)?data.appearance.assets:[];
