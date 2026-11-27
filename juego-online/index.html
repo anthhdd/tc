@@ -123,6 +123,14 @@ main{position:absolute;inset:0}
  #help{width:calc(100vw - 20px)}
 }
 
+
+/* CoreGui menu y burbuja de diálogo sobre el personaje */
+#coreMenuPanel{display:none;position:absolute;z-index:25;top:42px;left:8px;width:210px;padding:5px;background:rgba(245,245,245,.97);color:#222;border:1px solid #999;box-shadow:0 2px 8px #0005;font:13px Arial}
+#coreMenuPanel button{display:block;width:100%;padding:9px 10px;text-align:left;border:0;border-bottom:1px solid #ddd;background:transparent;color:#222;font:13px Arial;cursor:pointer}
+#coreMenuPanel button:hover{background:#e5e5e5}
+#coreMenuPanel .menuCaption{padding:7px 9px;color:#777;font-size:10px;font-weight:bold;text-transform:uppercase}
+#classicChat.is-hidden,#playerList.is-hidden{display:none}
+@media(max-width:620px){#coreMenuPanel{top:39px;left:5px;width:190px}}
 </style>
 </head>
 <body>
@@ -135,6 +143,7 @@ main{position:absolute;inset:0}
 <main>
 <div id="game" aria-label="Mundo 3D Baseplate"></div>
 <div id="classicTop"><button class="coreBtn" id="coreMenu" type="button" aria-label="Menú">☰</button><button class="coreBtn" id="coreReset" type="button">Reiniciar</button><span class="coreBrand">TAHU DE CHILL</span><span class="corePlace">Baseplate</span></div>
+<div id="coreMenuPanel" role="menu"><div class="menuCaption">Menú del juego</div><button type="button" id="menuResume">▶ Continuar</button><button type="button" id="menuChat">☷ Mostrar / ocultar chat</button><button type="button" id="menuPlayers">♟ Mostrar / ocultar jugadores</button><button type="button" id="menuReset">↻ Reiniciar personaje</button><button type="button" id="menuAvatar">☺ Cambiar avatar</button></div>
 <div class="hud">
  <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Shift: correr · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
  <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
@@ -347,8 +356,15 @@ spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 
 const state={x:0,z:0,y:0,vy:0,vx:0,vz:0,grounded:true,yaw:0,camYaw:0,camPitch:.18,keys:{},touch:{},started:!!window.tahuGameStarted,drag:false,lastX:0,lastY:0,cameraReady:false};
 window.addEventListener('tahu-game-start',()=>{state.started=true;});
-document.getElementById('coreReset').addEventListener('click',()=>{state.x=0;state.z=0;state.y=0;state.vx=0;state.vz=0;state.vy=0;state.grounded=true;avatar.position.set(0,0,0);state.cameraReady=false;});
-document.getElementById('coreMenu').addEventListener('click',()=>{const panel=document.getElementById('help');panel.style.display=panel.style.display==='none'?'block':'none';});
+function resetCharacter(){state.x=0;state.z=0;state.y=0;state.vx=0;state.vz=0;state.vy=0;state.grounded=true;avatar.position.set(0,0,0);state.cameraReady=false;}
+document.getElementById('coreReset').addEventListener('click',resetCharacter);
+const corePanel=document.getElementById('coreMenuPanel');
+document.getElementById('coreMenu').addEventListener('click',()=>{corePanel.style.display=corePanel.style.display==='block'?'none':'block';});
+document.getElementById('menuResume').addEventListener('click',()=>{corePanel.style.display='none';});
+document.getElementById('menuChat').addEventListener('click',()=>document.getElementById('classicChat').classList.toggle('is-hidden'));
+document.getElementById('menuPlayers').addEventListener('click',()=>document.getElementById('playerList').classList.toggle('is-hidden'));
+document.getElementById('menuReset').addEventListener('click',()=>{resetCharacter();corePanel.style.display='none';});
+document.getElementById('menuAvatar').addEventListener('click',()=>{document.getElementById('help').style.display='block';corePanel.style.display='none';});
 // Recupera el avatar si se introdujo antes de que terminara de iniciar Three.js.
 if(window.tahuAvatarData) window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
 const clock=new THREE.Clock();
@@ -362,6 +378,25 @@ window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
 window.addEventListener('blur',()=>{state.keys={};state.touch={};state.drag=false;});
 function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
 const accessoryGroup=new THREE.Group();headRig.add(accessoryGroup);
+// Burbuja de chat 3D anclada sobre la cabeza, al estilo Roblox clásico.
+let bubbleSprite=null,bubbleUntil=0;
+function showHeadBubble(message){
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=192;
+ const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,192);
+ const words=String(message).slice(0,180).split(/\\s+/);const lines=[];let line='';
+ ctx.font='bold 30px Arial';
+ for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>448&&line){lines.push(line);line=word;}else line=test;}
+ if(line)lines.push(line);const shown=lines.slice(0,3);const boxH=shown.length*37+34;const top=(192-boxH)/2;
+ ctx.fillStyle='rgba(255,255,255,.97)';ctx.strokeStyle='#555';ctx.lineWidth=5;
+ ctx.beginPath();ctx.roundRect(12,top,488,boxH,18);ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(218,top+boxH-2);ctx.lineTo(244,top+boxH+18);ctx.lineTo(268,top+boxH-2);ctx.closePath();ctx.fill();ctx.stroke();
+ ctx.fillStyle='#222';ctx.textAlign='center';ctx.textBaseline='middle';shown.forEach((text,i)=>ctx.fillText(text,256,top+20+i*37,450));
+ const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+ if(bubbleSprite){headRig.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();}
+ bubbleSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false}));
+ bubbleSprite.position.set(0,1.55,0);bubbleSprite.scale.set(3.35,1.25,1);bubbleSprite.renderOrder=10;headRig.add(bubbleSprite);bubbleUntil=performance.now()+4200;
+}
+window.addEventListener('tahu-chat-message',e=>showHeadBubble(e.detail?.text||''));
 function clearAccessories(){while(accessoryGroup.children.length){const child=accessoryGroup.children[0];accessoryGroup.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}})}}
 window.addEventListener('tahu-avatar-loaded',e=>{
  const data=e.detail||{};
@@ -494,13 +529,13 @@ function update(dt){
  const motionLabel=airborne?(rising?'Saltando':'Cayendo'):(horizontalSpeed>.35?(running?'Corriendo':'Caminando'):'En reposo');
  document.getElementById('status').textContent=localPlayerName+' · R6 · '+motionLabel;
 }
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);if(bubbleSprite&&performance.now()>bubbleUntil){headRig.remove(bubbleSprite);bubbleSprite.material.map.dispose();bubbleSprite.material.dispose();bubbleSprite=null;}renderer.render(scene,camera)}
 animate();
 </script>
 
 <script>
 (()=>{const form=document.getElementById('chatForm'),input=document.getElementById('chatInput'),log=document.getElementById('chatLog');if(!form)return;
-form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;const line=document.createElement('div');line.className='chatLine';const name=document.createElement('b');name.textContent='[Tú]: ';line.append(name,document.createTextNode(value));log.appendChild(line);log.scrollTop=log.scrollHeight;input.value='';});
+form.addEventListener('submit',e=>{e.preventDefault();const value=input.value.trim();if(!value)return;const line=document.createElement('div');line.className='chatLine';const name=document.createElement('b');name.textContent='[Tú]: ';line.append(name,document.createTextNode(value));log.appendChild(line);log.scrollTop=log.scrollHeight;window.dispatchEvent(new CustomEvent('tahu-chat-message',{detail:{text:value}}));input.value='';});
 })();
 </script>
 
