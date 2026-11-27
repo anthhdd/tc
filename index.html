@@ -6,60 +6,30 @@
 <meta name="theme-color" content="#111111">
 <title>Tahu De Chill</title>
 <style>
-:root{--bg:#111;--panel:#1b1b1b;--muted:#aaa;--orange:#ff9000;--yellow:#ffb900;--line:#303030}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f5f5f5;font:15px Arial,Helvetica,sans-serif}
-header{height:68px;background:#080808;border-bottom:1px solid #292929;display:flex;align-items:center;gap:26px;padding:0 clamp(16px,4vw,58px);position:sticky;top:0;z-index:5}
-.brand{font-size:25px;font-weight:900;letter-spacing:-1.3px;white-space:nowrap;color:white}.brand span{background:var(--orange);color:#111;padding:4px 6px;border-radius:5px;margin-left:2px}
-.search{display:flex;max-width:620px;flex:1;margin:auto}.search input{width:100%;background:#242424;border:1px solid #383838;border-right:0;border-radius:6px 0 0 6px;color:white;padding:12px 15px;outline:none}.search input:focus{border-color:var(--orange)}button{cursor:pointer;border:0}.search button{background:var(--orange);padding:0 20px;border-radius:0 6px 6px 0;font-weight:bold}
-.header-actions{display:flex;align-items:center;gap:10px;white-space:nowrap}.ghost{background:transparent;color:#ddd;padding:10px}.upload{background:var(--orange);color:#111;border-radius:5px;padding:10px 14px;font-weight:bold}
-nav{display:flex;gap:8px;align-items:center;padding:13px clamp(16px,4vw,58px);border-bottom:1px solid var(--line);overflow:auto;white-space:nowrap;background:#151515}
-nav a{color:#ccc;text-decoration:none;padding:8px 13px;border-radius:4px;font-size:14px}nav a:hover,nav a.active{background:#33230f;color:var(--yellow)}
-main{max-width:1500px;margin:0 auto;padding:26px clamp(16px,4vw,58px) 60px}
-.hero{background:linear-gradient(110deg,#2c1b09,#171717 65%);border:1px solid #493015;border-radius:9px;padding:28px 30px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px}.hero h1{font-size:clamp(23px,3vw,34px);margin:0 0 8px}.hero p{margin:0;color:#bbb}.hero strong{color:var(--yellow)}.hero .tag{font-size:12px;color:#ffbd55;border:1px solid #754713;padding:8px 12px;border-radius:30px}
-.section-head{display:flex;justify-content:space-between;align-items:center;margin:25px 0 16px}.section-head h2{font-size:20px;margin:0}.section-head a{color:var(--yellow);text-decoration:none;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 17px}
-.video{min-width:0;cursor:pointer}.thumb{aspect-ratio:16/9;border-radius:6px;position:relative;overflow:hidden;background:linear-gradient(135deg,#40230d,#a14c0c 48%,#171717);display:grid;place-items:center;border:1px solid #333}.thumb:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,#ffb44c66,transparent 28%),linear-gradient(145deg,transparent 35%,#0009)}.thumb .play{z-index:1;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#111b;color:#fff;font-size:18px;border:1px solid #ffffff55;transition:.2s}.video:hover .play{background:var(--orange);color:#111;transform:scale(1.08)}.thumb .duration{position:absolute;bottom:8px;right:8px;background:#000c;padding:4px 6px;border-radius:3px;font-size:11px}.thumb .quality{position:absolute;top:8px;left:8px;background:var(--orange);color:#111;font-size:10px;font-weight:bold;padding:4px 6px;border-radius:3px}
-.thumb.art2{background:linear-gradient(135deg,#202c35,#42616b,#111)}.thumb.art3{background:linear-gradient(135deg,#42252a,#a15c4c,#1a1115)}.thumb.art4{background:linear-gradient(135deg,#242b18,#75823e,#14170f)}.thumb.art5{background:linear-gradient(135deg,#29203e,#775ba3,#15101e)}.thumb.art6{background:linear-gradient(135deg,#3b2a1c,#bd8a4c,#17110b)}.thumb.art7{background:linear-gradient(135deg,#1d3440,#39849a,#101a20)}.thumb.art8{background:linear-gradient(135deg,#38222a,#a74f68,#170f13)}
-.info{display:flex;gap:10px;padding-top:10px}.avatar{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:#383838;display:grid;place-items:center;color:var(--yellow);font-weight:bold}.meta{min-width:0}.meta h3{font-size:14px;line-height:1.35;margin:0 0 6px;font-weight:600}.meta p{margin:0;color:#999;font-size:12px;line-height:1.6}.meta .views{color:#777}
-footer{border-top:1px solid var(--line);padding:25px clamp(16px,4vw,58px);color:#777;font-size:12px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}footer a{color:#aaa;text-decoration:none;margin-right:15px}
-.empty{display:none;color:#aaa;padding:35px;text-align:center;grid-column:1/-1;background:var(--panel);border-radius:8px}
-@media(max-width:1050px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.header-actions .ghost{display:none}}
-@media(max-width:720px){header{height:auto;min-height:62px;gap:12px;padding:12px 15px;flex-wrap:wrap}.brand{font-size:22px}.search{order:3;flex-basis:100%;max-width:none}.header-actions{margin-left:auto}.upload{padding:9px 10px}nav{padding:10px 12px}main{padding:18px 14px 40px}.hero{padding:20px;align-items:flex-start}.hero .tag{display:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 11px}.avatar{display:none}.meta h3{font-size:13px}}
-@media(max-width:390px){.grid{grid-template-columns:1fr}.thumb{aspect-ratio:16/8}}
+:root{--bg:#111;--orange:#ff9000;--yellow:#ffb900;--line:#303030}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:#f5f5f5;font:15px Arial,Helvetica,sans-serif;display:flex;flex-direction:column}
+header{height:68px;background:#080808;border-bottom:1px solid #292929;display:flex;align-items:center;padding:0 clamp(16px,4vw,58px)}
+.brand{font-size:25px;font-weight:900;letter-spacing:-1.3px;white-space:nowrap;color:white;text-decoration:none}
+.brand span{background:var(--orange);color:#111;padding:4px 6px;border-radius:5px;margin-left:2px}
+main{flex:1;display:grid;place-items:center;padding:40px 20px}
+.games{text-align:center;background:linear-gradient(135deg,#21170d,#171717 70%);border:1px solid #493015;border-radius:12px;padding:clamp(35px,7vw,70px);width:min(100%,760px);box-shadow:0 18px 60px #0005}
+h1{font-size:clamp(34px,6vw,56px);margin:0 0 18px;font-weight:900;letter-spacing:-1px}
+h1 span{color:var(--orange)}
+p{font-size:clamp(17px,2.5vw,21px);color:#bbb;margin:0}
+footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#777;font-size:12px}
 </style>
 </head>
 <body>
 <header>
-  <a class="brand" href="#" aria-label="Tahu De Chill inicio" style="text-decoration:none">tahu<span>de chill</span></a>
-  <form class="search" id="searchForm"><input id="searchInput" type="search" placeholder="Buscar vídeos, canales..." aria-label="Buscar"><button aria-label="Buscar">⌕</button></form>
-  <div class="header-actions"><button class="ghost" onclick="alert('Inicia sesión para continuar')">Iniciar sesión</button><button class="upload" onclick="alert('La función de subir vídeos estará disponible próximamente')">＋ Subir</button></div>
+  <a class="brand" href="./" aria-label="Tahu De Chill inicio">tahu<span>de chill</span></a>
 </header>
-<nav id="categories">
-  <a href="#" class="active" data-category="Todos">Para ti</a><a href="#" data-category="Popular">Popular</a><a href="#" data-category="Nuevos">Nuevos</a><a href="#" data-category="Tendencias">Tendencias</a><a href="#" data-category="Música">Música</a><a href="#" data-category="Deportes">Deportes</a><a href="#" data-category="Gaming">Gaming</a><a href="#" data-category="Lifestyle">Lifestyle</a>
-</nav>
 <main>
-  <section class="hero"><div><h1>Bienvenido a Tahu De Chill</h1><p>Explora vídeos populares, creadores y contenido destacado en <strong>Tahu De Chill</strong>.</p></div><span class="tag">✦ TU CONTENIDO, A TU MANERA</span></section>
-  <div class="section-head"><h2 id="sectionTitle">Vídeos recomendados</h2><a href="#" id="sortLink">Ver todos →</a></div>
-  <section class="grid" id="videoGrid">
-    <article class="video" data-title="aventura al aire libre naturaleza" data-category="Popular"><div class="thumb"><span class="quality">4K</span><span class="play">▶</span><span class="duration">12:48</span></div><div class="info"><div class="avatar">A</div><div class="meta"><h3>Una aventura increíble al aire libre</h3><p>Canal Aventura</p><p class="views">1,2 M visualizaciones · hace 2 días</p></div></div></article>
-    <article class="video" data-title="guía tecnología trucos" data-category="Nuevos"><div class="thumb art2"><span class="quality">HD</span><span class="play">▶</span><span class="duration">08:32</span></div><div class="info"><div class="avatar">T</div><div class="meta"><h3>Los mejores trucos de tecnología</h3><p>Tech al Día</p><p class="views">84 mil visualizaciones · hace 5 horas</p></div></div></article>
-    <article class="video" data-title="música directo sesión" data-category="Música"><div class="thumb art3"><span class="play">▶</span><span class="duration">24:10</span></div><div class="info"><div class="avatar">M</div><div class="meta"><h3>Sesión musical para desconectar</h3><p>Music Studio</p><p class="views">560 mil visualizaciones · hace 1 semana</p></div></div></article>
-    <article class="video" data-title="deporte entrenamiento fitness" data-category="Deportes"><div class="thumb art4"><span class="quality">4K</span><span class="play">▶</span><span class="duration">16:05</span></div><div class="info"><div class="avatar">F</div><div class="meta"><h3>Entrenamiento: mejora tu rutina</h3><p>FitZone</p><p class="views">230 mil visualizaciones · hace 3 días</p></div></div></article>
-    <article class="video" data-title="gaming videojuego partida" data-category="Gaming"><div class="thumb art5"><span class="play">▶</span><span class="duration">31:42</span></div><div class="info"><div class="avatar">G</div><div class="meta"><h3>La partida más intensa de la semana</h3><p>GG Central</p><p class="views">920 mil visualizaciones · hace 1 día</p></div></div></article>
-    <article class="video" data-title="cocina receta fácil" data-category="Lifestyle"><div class="thumb art6"><span class="quality">HD</span><span class="play">▶</span><span class="duration">10:19</span></div><div class="info"><div class="avatar">C</div><div class="meta"><h3>Una receta fácil que tienes que probar</h3><p>Cocina en Casa</p><p class="views">145 mil visualizaciones · hace 6 días</p></div></div></article>
-    <article class="video" data-title="viajes ciudad lugares" data-category="Tendencias"><div class="thumb art7"><span class="play">▶</span><span class="duration">19:57</span></div><div class="info"><div class="avatar">V</div><div class="meta"><h3>Una ciudad que merece la pena visitar</h3><p>Viajes sin Filtro</p><p class="views">2,1 M visualizaciones · hace 4 días</p></div></div></article>
-    <article class="video" data-title="lifestyle creatividad diseño" data-category="Popular"><div class="thumb art8"><span class="quality">4K</span><span class="play">▶</span><span class="duration">14:26</span></div><div class="info"><div class="avatar">L</div><div class="meta"><h3>Ideas creativas para tu día a día</h3><p>Modo Creativo</p><p class="views">310 mil visualizaciones · hace 2 semanas</p></div></div></article>
-    <div class="empty" id="emptyState">No se han encontrado vídeos. Prueba con otra búsqueda.</div>
+  <section class="games">
+    <h1><span>Games</span></h1>
+    <p>¡Pronto juegos!</p>
   </section>
 </main>
-<footer><span>© 2026 Tahu De Chill. Proyecto de demostración.</span><span><a href="#">Acerca de</a><a href="#">Privacidad</a><a href="#">Contacto</a></span></footer>
-<script>
-const cards=[...document.querySelectorAll('.video')], input=document.getElementById('searchInput'), empty=document.getElementById('emptyState'), title=document.getElementById('sectionTitle');let category='Todos';
-function filter(){const q=input.value.toLocaleLowerCase('es');let shown=0;cards.forEach(card=>{const matchText=card.dataset.title.includes(q)||card.innerText.toLocaleLowerCase('es').includes(q);const matchCat=category==='Todos'||category==='Para ti'||card.dataset.category===category;card.style.display=matchText&&matchCat?'':'none';if(matchText&&matchCat)shown++});empty.style.display=shown?'none':'block';title.textContent=category==='Todos'?'Vídeos recomendados':category}
-document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();filter()});input.addEventListener('input',filter);
-document.querySelectorAll('#categories a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('#categories a').forEach(x=>x.classList.remove('active'));a.classList.add('active');category=a.dataset.category;filter()}));
-cards.forEach(card=>card.addEventListener('click',()=>alert('Esta es una vista de demostración. Conecta aquí el reproductor de vídeo que quieras utilizar.')));
-document.getElementById('sortLink').addEventListener('click',e=>{e.preventDefault();category='Todos';input.value='';document.querySelectorAll('#categories a').forEach(x=>x.classList.toggle('active',x.dataset.category==='Todos'));filter()});
-</script>
+<footer>© 2026 Tahu De Chill</footer>
 </body>
 </html>
