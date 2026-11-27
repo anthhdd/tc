@@ -96,36 +96,46 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
 </main>
 <footer>© 2026 Tahu De Chill</footer>
 <script>
-(()=>{
+(()=> {
  const form=document.getElementById('robloxForm'),input=document.getElementById('robloxUser');
  const message=document.getElementById('avatarMessage'),preview=document.getElementById('robloxPreview');
  const load=document.getElementById('loadAvatar'),start=document.getElementById('start');
  form.addEventListener('submit',async e=>{
   e.preventDefault();const username=input.value.trim();if(!username)return;
-  load.disabled=true;load.textContent='…';message.textContent='Buscando usuario de Roblox…';
+  load.disabled=true;load.textContent='BUSCANDO';message.textContent='Buscando el usuario…';
   try{
-   const response=await fetch('https://users.roblox.com/v1/usernames/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usernames:[username],excludeBannedUsers:true})});
-   if(!response.ok)throw new Error('Roblox no responde ahora mismo. Puedes jugar con el avatar básico.');
-   const result=await response.json(),user=result.data&&result.data[0];
-   if(!user)throw new Error('No encontramos ese usuario. Comprueba el nombre.');
-   message.textContent='Cargando avatar de '+user.name+'…';
-   const thumb=await fetch('https://thumbnails.roblox.com/v1/users/avatar?userIds='+user.id+'&size=420x420&format=Png&isCircular=false');
-   if(!thumb.ok)throw new Error('No se pudo obtener la imagen. Puedes jugar con el avatar básico.');
+   // Roblox suele bloquear peticiones directas desde webs externas (CORS).
+   // roproxy ofrece una ruta GET compatible para buscar nombres públicos.
+   const url='https://users.roproxy.com/v1/users/search?keyword='+encodeURIComponent(username)+'&limit=10';
+   const response=await fetch(url,{headers:{'Accept':'application/json'}});
+   if(!response.ok)throw new Error('El servicio de avatares no está disponible. Prueba más tarde; puedes jugar sin cargarlo.');
+   const result=await response.json();
+   const users=result.data||[];
+   const user=users.find(u=>(u.name||'').toLowerCase()===username.toLowerCase())||users[0];
+   if(!user)throw new Error('No encontramos ese usuario. Revisa cómo está escrito.');
+   message.textContent='Usuario '+user.name+' encontrado. Cargando imagen…';
+   const thumbUrl='https://thumbnails.roproxy.com/v1/users/avatar?userIds='+user.id+'&size=420x420&format=Png&isCircular=false';
+   const thumb=await fetch(thumbUrl,{headers:{'Accept':'application/json'}});
+   if(!thumb.ok)throw new Error('Encontramos el usuario, pero Roblox no entregó su imagen. Puedes jugar con el avatar clásico.');
    const data=await thumb.json(),imageUrl=data.data&&data.data[0]&&data.data[0].imageUrl;
-   if(!imageUrl)throw new Error('Avatar no disponible. Puedes jugar con el avatar básico.');
+   if(!imageUrl)throw new Error('La imagen del avatar no está disponible. Puedes jugar con el avatar clásico.');
+   preview.onload=()=>{message.textContent='¡Avatar de '+user.name+' cargado!';};
+   preview.onerror=()=>{message.textContent='Usuario encontrado, pero no se pudo mostrar la imagen. Puedes jugar igualmente.';};
    preview.src=imageUrl;preview.style.display='block';
-   window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:{imageUrl,userName:user.name}}));
-   message.textContent='¡Avatar de '+user.name+' encontrado! Ya puedes jugar.';
-  }catch(err){message.textContent=err.message||'Error de conexión con Roblox. Puedes jugar igualmente.'}
-  finally{load.disabled=false;load.textContent='CARGAR'}
+   window.tahuAvatarData={imageUrl,userName:user.name};
+   window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
+  }catch(err){message.textContent=(err&&err.message)||'No se pudo conectar con Roblox. Puedes jugar con el avatar clásico.';}
+  finally{load.disabled=false;load.textContent='CARGAR';}
  });
+ // El botón funciona aunque Three.js tarde en cargar: el inicio queda guardado.
  start.disabled=false;
  start.addEventListener('click',()=>{
+  window.tahuGameStarted=true;
   document.getElementById('help').style.display='none';
   window.dispatchEvent(new Event('tahu-game-start'));
  });
 })();
-</script>
+</script>>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -197,7 +207,10 @@ spawnPad.position.set(0,.1,0);spawnPad.receiveShadow=true;scene.add(spawnPad);
 const spawnMark=new THREE.Mesh(new THREE.BoxGeometry(2,.04,2),new THREE.MeshStandardMaterial({color:0xff9000,emissive:0x552000}));
 spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 
-const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.18,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0,cameraReady:false};
+const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.18,keys:{},touch:{},started:!!window.tahuGameStarted,drag:false,lastX:0,lastY:0,cameraReady:false};
+window.addEventListener('tahu-game-start',()=>{state.started=true;});
+// Recupera el avatar si se introdujo antes de que terminara de iniciar Three.js.
+if(window.tahuAvatarData) window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
 const clock=new THREE.Clock();
 function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
 new ResizeObserver(resize).observe(mount);resize();
