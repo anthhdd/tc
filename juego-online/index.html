@@ -57,18 +57,24 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
 #playerEntry:before{content:"●";color:#35a853;margin-right:6px}
 #classicTop{position:absolute;z-index:8;top:0;left:0;right:0;height:34px;background:linear-gradient(#f7f7f7,#d8d8d8);border-bottom:1px solid #777;display:flex;align-items:center;padding:0 10px;color:#222;font:bold 13px Arial;pointer-events:none}
 #classicTop span{color:#555;font-weight:normal;margin-left:10px}
-#help{top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100% - 30px));padding:18px;background:rgba(30,30,30,.96);border:1px solid #888;border-radius:3px}
+#help{top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 24px));padding:20px;background:rgba(30,30,30,.97);border:1px solid #888;border-radius:3px;max-height:calc(100% - 24px);overflow-y:auto;z-index:30}
 #help h1{font-size:21px}
 #help p{font-size:13px}
 #start{min-width:150px;border-radius:2px;background:linear-gradient(#ffbd4b,#e47a00);border:1px solid #9a5300;padding:11px 22px}
-#robloxForm{margin:10px 0}
-#robloxUser{border-radius:2px}
+#robloxForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%;margin:12px 0;align-items:stretch}
+#robloxUser{display:block;width:100%;min-width:0;max-width:100%;height:44px;padding:10px 12px;border-radius:2px;font:16px Arial,sans-serif;line-height:22px;text-align:left;direction:ltr;user-select:text;-webkit-user-select:text;pointer-events:auto;box-sizing:border-box}
+#loadAvatar{min-width:88px;min-height:44px;padding:0 12px;white-space:nowrap;touch-action:manipulation;pointer-events:auto}
+#help input,#help button{position:relative;z-index:31}
+#help p{overflow-wrap:anywhere}
 #loadAvatar{border-radius:2px}
 #robloxPreview{width:72px;height:72px}
 .hud{top:42px}
 .hud-card{border-radius:2px}
 #toast{display:none}
 @media(max-width:620px){
+ #help{width:calc(100vw - 20px);padding:16px;max-height:calc(100% - 20px)}
+ #robloxForm{grid-template-columns:minmax(0,1fr) 88px;gap:6px}
+ #robloxUser{font-size:16px;min-width:0;width:100%}
  #classicChat{bottom:8px;left:8px;width:min(285px,calc(100% - 16px))}
  #chatLog{height:76px}
  #playerList{right:8px;top:76px;width:128px}
@@ -156,9 +162,20 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
   window.dispatchEvent(new Event('tahu-game-start'));
  });
 })();
-</script>>
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+let THREE;
+try { THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
+catch(firstError) {
+ try { THREE=await import('https://unpkg.com/three@0.160.0/build/three.module.js'); }
+ catch(secondError) {
+  const status=document.getElementById('status');
+  if(status) status.textContent='No se pudo cargar el motor 3D. Comprueba tu conexión y recarga.';
+  const help=document.getElementById('help');
+  if(help) { help.style.display='block'; const p=document.createElement('p'); p.textContent='No se pudo cargar el motor 3D. Prueba a recargar la página.'; help.appendChild(p); }
+  throw secondError;
+ }
+}
 
 const mount=document.getElementById('game');
 const startButton=document.getElementById('start');
