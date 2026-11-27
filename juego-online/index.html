@@ -84,6 +84,45 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
  .controls{inset:auto 10px 10px}
 }
 
+
+/* Roblox 2016 CoreGui-inspired in-game chrome */
+header,footer{display:none}
+main{position:absolute;inset:0}
+#classicTop{height:36px;background:linear-gradient(#f7f7f7,#d9d9d9);border-bottom:1px solid #999;color:#333;box-shadow:0 1px 3px #0003;pointer-events:auto;padding:0 8px;gap:6px}
+#classicTop .coreBtn{height:26px;min-width:30px;border:1px solid #aaa;border-radius:3px;background:linear-gradient(#fff,#ddd);color:#333;font: bold 13px Arial;padding:0 9px;cursor:pointer}
+#classicTop .coreBrand{font-weight:bold;font-size:12px;color:#444;margin-left:4px}
+#classicTop .corePlace{font-weight:normal;color:#777;margin-left:8px;font-size:12px}
+#playerList{top:43px;right:8px;width:190px;background:rgba(245,245,245,.94);border:1px solid #aaa;border-radius:2px;box-shadow:0 1px 4px #0003}
+#playerList header{display:block;height:auto;min-height:26px;padding:6px 9px;background:linear-gradient(#fafafa,#ddd);border-bottom:1px solid #bbb;color:#333;font:bold 12px Arial}
+#playerEntry{background:rgba(255,255,255,.92);padding:7px 9px;color:#333}
+#classicChat{left:8px;bottom:8px;width:min(340px,calc(100% - 16px));background:rgba(245,245,245,.9);border:1px solid #aaa;border-radius:2px;box-shadow:0 1px 4px #0003}
+#classicChat .chatHead{height:26px;background:linear-gradient(#fafafa,#ddd);color:#333;border-bottom:1px solid #bbb;padding:6px 8px}
+#chatLog{height:105px;background:rgba(255,255,255,.86)}
+#chatForm{background:#eee}
+#chatNotice{background:#eee}
+#help{background:linear-gradient(#fafafa,#e5e5e5);color:#333;border:1px solid #888;border-radius:3px;box-shadow:0 2px 12px #0004}
+#help h1,#help p{color:#333}
+#help h1 span{color:#e77b00}
+#help #avatarMessage{color:#555}
+#avatarType{display:inline-block;margin:4px auto 10px;padding:5px 10px;background:#ddd;border:1px solid #aaa;color:#444;font:bold 11px Arial;letter-spacing:.3px}
+#robloxUser{background:#fff;color:#222;border:1px solid #999}
+#loadAvatar{background:linear-gradient(#fff,#ddd);border:1px solid #999;color:#333}
+#start{background:linear-gradient(#ffbd4b,#e47a00);border:1px solid #a65d00;color:#211}
+.hud{top:43px}
+.hud-card{background:rgba(245,245,245,.9);color:#333;border:1px solid #aaa;border-radius:2px;box-shadow:0 1px 4px #0002}
+.game-title,.status{color:#333}
+.game-title span{color:#df7900}
+.hint{color:#555}
+.controls .ctrl{border:1px solid #888;border-radius:3px;background:#eee;color:#333;box-shadow:0 1px 3px #0003}
+#jump{background:linear-gradient(#ffbd4b,#e47a00);color:#211}
+@media(max-width:620px){
+ #playerList{top:42px;right:5px;width:145px}
+ #classicChat{width:min(280px,calc(100% - 10px));left:5px;bottom:5px}
+ #chatLog{height:76px}
+ #classicTop .corePlace{display:none}
+ #help{width:calc(100vw - 20px)}
+}
+
 </style>
 </head>
 <body>
@@ -95,12 +134,12 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
 </header>
 <main>
 <div id="game" aria-label="Mundo 3D Baseplate"></div>
-<div id="classicTop">☰ &nbsp; TAHU DE CHILL <span>Baseplate</span></div>
+<div id="classicTop"><button class="coreBtn" id="coreMenu" type="button" aria-label="Menú">☰</button><button class="coreBtn" id="coreReset" type="button">Reiniciar</button><span class="coreBrand">TAHU DE CHILL</span><span class="corePlace">Baseplate</span></div>
 <div class="hud">
  <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
  <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
 </div>
-<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" autocomplete="off" maxlength="20" placeholder="Usuario de Roblox" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><img id="robloxPreview" alt="Vista previa de tu avatar de Roblox"><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
+<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" autocomplete="off" maxlength="20" placeholder="Usuario de Roblox" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><div id="avatarType">PERSONAJE 3D · R6</div><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
 <div class="controls">
  <div class="pad">
   <button class="ctrl" id="forward" aria-label="Adelante">▲</button>
@@ -140,16 +179,9 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
    const users=result.data||[];
    const user=users.find(u=>(u.name||'').toLowerCase()===username.toLowerCase())||users[0];
    if(!user)throw new Error('No encontramos ese usuario. Revisa cómo está escrito.');
-   message.textContent='Usuario '+user.name+' encontrado. Cargando imagen…';
-   const thumbUrl='https://thumbnails.roproxy.com/v1/users/avatar?userIds='+user.id+'&size=420x420&format=Png&isCircular=false';
-   const thumb=await fetch(thumbUrl,{headers:{'Accept':'application/json'}});
-   if(!thumb.ok)throw new Error('Encontramos el usuario, pero Roblox no entregó su imagen. Puedes jugar con el avatar clásico.');
-   const data=await thumb.json(),imageUrl=data.data&&data.data[0]&&data.data[0].imageUrl;
-   if(!imageUrl)throw new Error('La imagen del avatar no está disponible. Puedes jugar con el avatar clásico.');
-   preview.onload=()=>{message.textContent='¡Avatar de '+user.name+' cargado!';};
-   preview.onerror=()=>{message.textContent='Usuario encontrado, pero no se pudo mostrar la imagen. Puedes jugar igualmente.';};
-   preview.src=imageUrl;preview.style.display='block';
-   window.tahuAvatarData={imageUrl,userName:user.name};
+   // El personaje del juego es un modelo R6 3D construido con mallas, nunca una imagen.
+   window.tahuAvatarData={userName:user.name};
+   message.textContent='¡'+user.name+' listo! Tu personaje 3D R6 está preparado.';
    window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
   }catch(err){message.textContent=(err&&err.message)||'No se pudo conectar con Roblox. Puedes jugar con el avatar clásico.';}
   finally{load.disabled=false;load.textContent='CARGAR';}
@@ -217,8 +249,8 @@ const grid=new THREE.GridHelper(160,40,0x397d38,0x4c9444);grid.position.y=.008;s
 
 // Avatar R6: cabeza, torso, dos brazos y dos piernas rígidos.
 const avatar=new THREE.Group();scene.add(avatar);
-let robloxAvatarSprite=null;
 let robloxAvatarLoaded=false;
+let localPlayerName='Tú';
 const skin=new THREE.MeshStandardMaterial({color:0xf0c18c,roughness:.85});
 const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
 const pants=new THREE.MeshStandardMaterial({color:0x263c73,roughness:.95});
@@ -247,6 +279,8 @@ spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 
 const state={x:0,z:0,y:0,vy:0,vx:0,vz:0,grounded:true,yaw:0,camYaw:0,camPitch:.18,keys:{},touch:{},started:!!window.tahuGameStarted,drag:false,lastX:0,lastY:0,cameraReady:false};
 window.addEventListener('tahu-game-start',()=>{state.started=true;});
+document.getElementById('coreReset').addEventListener('click',()=>{state.x=0;state.z=0;state.y=0;state.vx=0;state.vz=0;state.vy=0;state.grounded=true;avatar.position.set(0,0,0);state.cameraReady=false;});
+document.getElementById('coreMenu').addEventListener('click',()=>{const panel=document.getElementById('help');panel.style.display=panel.style.display==='none'?'block':'none';});
 // Recupera el avatar si se introdujo antes de que terminara de iniciar Three.js.
 if(window.tahuAvatarData) window.dispatchEvent(new CustomEvent('tahu-avatar-loaded',{detail:window.tahuAvatarData}));
 const clock=new THREE.Clock();
@@ -260,16 +294,18 @@ window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
 window.addEventListener('blur',()=>{state.keys={};state.touch={};state.drag=false;});
 function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
 window.addEventListener('tahu-avatar-loaded',e=>{
- const {imageUrl}=e.detail||{};
- if(!imageUrl)return;
- new THREE.TextureLoader().load(imageUrl,texture=>{
-  texture.colorSpace=THREE.SRGBColorSpace;
-  if(robloxAvatarSprite){scene.remove(robloxAvatarSprite);robloxAvatarSprite.material.map.dispose();robloxAvatarSprite.material.dispose()}
-  robloxAvatarSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false}));
-  robloxAvatarSprite.scale.set(3.2,4.6,1);
-  robloxAvatarSprite.position.set(state.x,2.45,state.z);
-  scene.add(robloxAvatarSprite);avatar.visible=false;robloxAvatarLoaded=true;
- });
+ const data=e.detail||{};
+ if(data.userName){
+  localPlayerName=data.userName;
+  const entry=document.getElementById('playerEntry');
+  if(entry)entry.textContent=localPlayerName;
+  const title=document.querySelector('#playerList header');
+  if(title)title.textContent='Jugadores (1)';
+ }
+ // El avatar permanece como personaje R6 tridimensional con cabeza, torso,
+ // brazos y piernas articulados. No se sustituye por thumbnails ni sprites.
+ avatar.visible=true;
+ robloxAvatarLoaded=true;
 });
 document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
 for(const [id,key] of [['forward','w'],['back','s'],['left','a'],['right','d']]){
@@ -308,7 +344,6 @@ function update(dt){
  state.vy-=25*dt;state.y+=state.vy*dt;
  if(state.y<=0){state.y=0;state.vy=0;state.grounded=true}
  avatar.position.set(state.x,state.y, state.z);avatar.rotation.y=state.yaw;
- if(robloxAvatarSprite){robloxAvatarSprite.position.set(state.x,state.y+2.45,state.z);robloxAvatarSprite.quaternion.copy(camera.quaternion)}
  const dist=camera.userData.distance||10;
  const target=new THREE.Vector3(state.x, state.y+2.7, state.z);
  const horizontal=Math.cos(state.camPitch)*dist;
@@ -317,7 +352,7 @@ function update(dt){
  if(!state.cameraReady){camera.position.copy(desired);state.cameraReady=true}
  else camera.position.lerp(desired,1-Math.exp(-8*dt));
  camera.lookAt(target);
- document.getElementById('status').innerHTML='Modo 3D · Avatar R6<br>'+Math.round(state.x)+' , '+Math.round(state.z);
+ document.getElementById('status').textContent=localPlayerName+' · R6';
 }
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
 animate();
