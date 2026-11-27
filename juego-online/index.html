@@ -30,6 +30,7 @@ main{position:relative;flex:1;min-height:0;background:#83c9ed}
 #help p{color:#d2e0e7;line-height:1.45;margin:0 0 10px}
 #start{border:0;border-radius:8px;background:var(--orange);color:#111;font-size:15px;font-weight:900;padding:12px 24px;cursor:pointer}
 #start:hover{filter:brightness(1.1);transform:translateY(-1px)}
+#robloxForm{display:flex;gap:7px;margin:12px 0 8px}#robloxUser{min-width:0;flex:1;padding:11px;border:1px solid #71808a;border-radius:8px;background:#0b1118;color:white;font-size:14px}#loadAvatar{border:0;border-radius:8px;padding:0 12px;background:#fff;color:#111;font-weight:800;cursor:pointer}#avatarMessage{min-height:18px;font-size:12px;color:#ffd18a;margin:5px 0 10px}#start:disabled{opacity:.45;cursor:not-allowed}#robloxPreview{width:64px;height:64px;object-fit:contain;display:none;margin:0 auto 8px}
 .controls{position:absolute;z-index:3;inset:auto 16px 16px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
 .pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px);gap:6px;pointer-events:auto}
 .ctrl{border:1px solid #ffffff66;border-radius:12px;background:#101820a8;color:#fff;font-size:20px;font-weight:800;touch-action:none;user-select:none}
@@ -54,7 +55,7 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
  <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
  <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
 </div>
-<div id="help"><h1>Bienvenido a <span>Baseplate</span></h1><p>Un mundo 3D con avatar de bloques estilo R6. Muévete por la plataforma, salta y explora.</p><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra sobre el mundo para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
+<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" autocomplete="off" maxlength="20" placeholder="Usuario de Roblox" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><img id="robloxPreview" alt="Vista previa de tu avatar de Roblox"><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra para girar la cámara.</p><button id="start" disabled>¡JUGAR!</button></div>
 <div class="controls">
  <div class="pad">
   <button class="ctrl" id="forward" aria-label="Adelante">▲</button>
@@ -112,6 +113,8 @@ const grid=new THREE.GridHelper(160,40,0x397d38,0x4c9444);grid.position.y=.008;s
 
 // Avatar R6: cabeza, torso, dos brazos y dos piernas rígidos.
 const avatar=new THREE.Group();scene.add(avatar);
+let robloxAvatarSprite=null;
+let robloxAvatarLoaded=false;
 const skin=new THREE.MeshStandardMaterial({color:0xf0c18c,roughness:.85});
 const shirt=new THREE.MeshStandardMaterial({color:0xff8a00,roughness:.9});
 const pants=new THREE.MeshStandardMaterial({color:0x263c73,roughness:.95});
@@ -148,7 +151,56 @@ function keyName(k){return k.toLowerCase()}
 window.addEventListener('keydown',e=>{const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
 window.addEventListener('keyup',e=>state.keys[keyName(e.key)]=false);
 function jump(){if(state.started&&state.grounded){state.vy=10.5;state.grounded=false}}
-document.getElementById('start').addEventListener('click',()=>{state.started=true;document.getElementById('help').style.display='none';renderer.domElement.focus()});
+const robloxForm=document.getElementById('robloxForm');
+const robloxInput=document.getElementById('robloxUser');
+const avatarMessage=document.getElementById('avatarMessage');
+const robloxPreview=document.getElementById('robloxPreview');
+const loadAvatarButton=document.getElementById('loadAvatar');
+robloxForm.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const username=robloxInput.value.trim();
+ if(!username)return;
+ loadAvatarButton.disabled=true;loadAvatarButton.textContent='…';
+ avatarMessage.textContent='Buscando usuario de Roblox…';
+ try{
+  const userResponse=await fetch('https://users.roblox.com/v1/usernames/users',{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({usernames:[username],excludeBannedUsers:true})
+  });
+  if(!userResponse.ok)throw new Error('No se pudo consultar Roblox. Inténtalo de nuevo.');
+  const userData=await userResponse.json();
+  const user=userData.data&&userData.data[0];
+  if(!user)throw new Error('No encontramos ese usuario. Revisa cómo está escrito.');
+  avatarMessage.textContent='Cargando el avatar de '+user.name+'…';
+  const thumbResponse=await fetch('https://thumbnails.roblox.com/v1/users/avatar?userIds='+user.id+'&size=420x420&format=Png&isCircular=false');
+  if(!thumbResponse.ok)throw new Error('Roblox no ha podido entregar la imagen del avatar.');
+  const thumbData=await thumbResponse.json();
+  const imageUrl=thumbData.data&&thumbData.data[0]&&thumbData.data[0].imageUrl;
+  if(!imageUrl)throw new Error('El avatar todavía no está disponible. Prueba otra vez.');
+  const texture=await new THREE.TextureLoader().loadAsync(imageUrl);
+  texture.colorSpace=THREE.SRGBColorSpace;
+  if(robloxAvatarSprite){scene.remove(robloxAvatarSprite);robloxAvatarSprite.material.map.dispose();robloxAvatarSprite.material.dispose()}
+  const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false});
+  robloxAvatarSprite=new THREE.Sprite(material);
+  robloxAvatarSprite.scale.set(3.2,4.6,1);
+  robloxAvatarSprite.position.set(0,2.45,0);
+  scene.add(robloxAvatarSprite);
+  avatar.visible=false;
+  robloxAvatarLoaded=true;
+  robloxPreview.src=imageUrl;robloxPreview.style.display='block';
+  avatarMessage.textContent='¡Avatar de '+user.name+' cargado correctamente!';
+  document.getElementById('status').innerHTML='Roblox: '+user.name+'<br>Avatar cargado';
+  document.getElementById('start').disabled=false;
+ }catch(error){
+  avatarMessage.textContent=error.message||'Error al cargar el avatar. Inténtalo otra vez.';
+ }finally{
+  loadAvatarButton.disabled=false;loadAvatarButton.textContent='CARGAR';
+ }
+});
+document.getElementById('start').addEventListener('click',()=>{
+ if(!robloxAvatarLoaded)return;
+ state.started=true;document.getElementById('help').style.display='none';renderer.domElement.focus()
+});
 document.getElementById('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
 for(const [id,key] of [['forward','w'],['back','s'],['left','a'],['right','d']]){
  const el=document.getElementById(id);
@@ -182,6 +234,7 @@ function update(dt){
  state.vy-=25*dt;state.y+=state.vy*dt;
  if(state.y<=0){state.y=0;state.vy=0;state.grounded=true}
  avatar.position.set(state.x,state.y, state.z);avatar.rotation.y=state.yaw;
+ if(robloxAvatarSprite){robloxAvatarSprite.position.set(state.x,state.y+2.45,state.z);robloxAvatarSprite.quaternion.copy(camera.quaternion)}
  const dist=camera.userData.distance||10;
  const target=new THREE.Vector3(state.x, state.y+2.7, state.z);
  const horizontal=Math.cos(state.camPitch)*dist;
