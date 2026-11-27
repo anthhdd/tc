@@ -136,10 +136,10 @@ main{position:absolute;inset:0}
 <div id="game" aria-label="Mundo 3D Baseplate"></div>
 <div id="classicTop"><button class="coreBtn" id="coreMenu" type="button" aria-label="Menú">☰</button><button class="coreBtn" id="coreReset" type="button">Reiniciar</button><span class="coreBrand">TAHU DE CHILL</span><span class="corePlace">Baseplate</span></div>
 <div class="hud">
- <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
+ <div class="hud-card"><div class="game-title">TAHU <span>BASEPLATE</span></div><div class="hint">WASD / flechas: moverse · Shift: correr · Espacio: saltar<br>Arrastra el ratón para girar la cámara</div></div>
  <div class="hud-card status" id="status">Modo 3D · Avatar R6<br>Explora la baseplate</div>
 </div>
-<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" autocomplete="off" maxlength="20" placeholder="Usuario de Roblox" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><div id="avatarType">PERSONAJE 3D · R6</div><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> para caminar · <strong>ESPACIO</strong> para saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
+<div id="help"><h1>Tu avatar de <span>Roblox</span></h1><p>Escribe tu nombre de usuario de Roblox para cargar tu avatar en el juego.</p><form id="robloxForm"><input id="robloxUser" autocomplete="off" maxlength="20" placeholder="Usuario de Roblox" aria-label="Usuario de Roblox" required><button id="loadAvatar" type="submit">CARGAR</button></form><div id="avatarType">PERSONAJE 3D · R6</div><div id="avatarMessage">No necesitas contraseña ni iniciar sesión.</div><p><strong>WASD</strong> caminar · <strong>SHIFT</strong> correr · <strong>ESPACIO</strong> saltar<br>Arrastra para girar la cámara.</p><button id="start">¡JUGAR!</button></div>
 <div class="controls">
  <div class="pad">
   <button class="ctrl" id="forward" aria-label="Adelante">▲</button>
@@ -273,7 +273,8 @@ block(leftLeg,.64,.28,.86,dark,0,-1.62,.08);
 const rightLeg=new THREE.Group();rightLeg.position.set(.43,1.72,0);avatar.add(rightLeg);
 block(rightLeg,.62,1.65,.68,pants,0,-.78,0);
 block(rightLeg,.64,.28,.86,dark,0,-1.62,.08);
-let walkPhase=0,idlePhase=0;
+let walkPhase=0,idlePhase=0,landPulse=0,previousAirborne=false;
+const smooth=(a,b,rate,dt)=>THREE.MathUtils.damp(a,b,rate,dt);
 const spawnPad=new THREE.Mesh(new THREE.BoxGeometry(9,.18,9),new THREE.MeshStandardMaterial({color:0x777777,roughness:1}));
 spawnPad.position.set(0,.1,0);spawnPad.receiveShadow=true;scene.add(spawnPad);
 const spawnMark=new THREE.Mesh(new THREE.BoxGeometry(2,.04,2),new THREE.MeshStandardMaterial({color:0xff9000,emissive:0x552000}));
@@ -334,26 +335,41 @@ function update(dt){
  const angle=state.camYaw;
  const dx=(Math.sin(angle)*f+Math.cos(angle)*s);
  const dz=(-Math.cos(angle)*f+Math.sin(angle)*s);
- const targetSpeed=forward||side?10:0;
+ const running=!!(k.shift||k.shiftleft||k.shiftright);
+ const targetSpeed=moving?(running?16:10):0;
  state.vx=state.vx||0;state.vz=state.vz||0;
- const accel= moving?34:42;
+ const accel= moving? (running?42:34):42;
  state.vx+=(dx*targetSpeed-state.vx)*Math.min(1,accel*dt);
  state.vz+=(dz*targetSpeed-state.vz)*Math.min(1,accel*dt);
  state.x+=state.vx*dt;state.z+=state.vz*dt;
  if(state.x<-77||state.x>77){state.x=THREE.MathUtils.clamp(state.x,-77,77);state.vx=0}if(state.z<-77||state.z>77){state.z=THREE.MathUtils.clamp(state.z,-77,77);state.vz=0}
  const horizontalSpeed=Math.hypot(state.vx,state.vz);
- const walkBlend=THREE.MathUtils.clamp(horizontalSpeed/7,0,1);
+ const walkBlend=THREE.MathUtils.clamp(horizontalSpeed/10,0,1);
+ const runBlend=THREE.MathUtils.clamp((horizontalSpeed-10)/6,0,1);
  if(horizontalSpeed>.15)state.yaw=Math.atan2(state.vx,state.vz);
- walkPhase+=dt*(5.5+horizontalSpeed*1.05);idlePhase+=dt;
- const stride=Math.sin(walkPhase)*.72*walkBlend;
+ walkPhase+=dt*(5.8+horizontalSpeed*(running?1.05:.78));idlePhase+=dt;
  const airborne=!state.grounded;
- leftLeg.rotation.x=THREE.MathUtils.damp(leftLeg.rotation.x,airborne?-.28:stride,12,dt);
- rightLeg.rotation.x=THREE.MathUtils.damp(rightLeg.rotation.x,airborne?-.28:-stride,12,dt);
- leftArm.rotation.x=THREE.MathUtils.damp(leftArm.rotation.x,airborne?.85:-stride*.72,12,dt);
- rightArm.rotation.x=THREE.MathUtils.damp(rightArm.rotation.x,airborne?.85:stride*.72,12,dt);
- torsoRig.rotation.z=THREE.MathUtils.damp(torsoRig.rotation.z,Math.sin(walkPhase)*.045*walkBlend,8,dt);
- torsoRig.position.y=2.65+(airborne?-.06:Math.abs(Math.sin(walkPhase*2))*.055*walkBlend+Math.sin(idlePhase*1.8)*.018*(1-walkBlend));
- headRig.rotation.x=airborne?-.08:Math.sin(idlePhase*1.4)*.018;
+ const rising=airborne&&state.vy>1.2;
+ const falling=airborne&&state.vy<=1.2;
+ const stride=Math.sin(walkPhase)*(0.72+runBlend*.18)*walkBlend;
+ // Ciclo R6: brazos opuestos, cadera alterna y balanceo del torso.
+ const legTarget=airborne?(rising?-.34:.62):stride;
+ const armTarget=airborne?(rising?1.02:-.38):-stride*.78;
+ leftLeg.rotation.x=smooth(leftLeg.rotation.x,legTarget,14,dt);
+ rightLeg.rotation.x=smooth(rightLeg.rotation.x,airborne?legTarget:-stride,14,dt);
+ leftArm.rotation.x=smooth(leftArm.rotation.x,armTarget,13,dt);
+ rightArm.rotation.x=smooth(rightArm.rotation.x,airborne?armTarget:stride*.78,13,dt);
+ leftArm.rotation.z=smooth(leftArm.rotation.z,airborne?-.10:-.035*walkBlend,10,dt);
+ rightArm.rotation.z=smooth(rightArm.rotation.z,airborne?.10:.035*walkBlend,10,dt);
+ torsoRig.rotation.z=smooth(torsoRig.rotation.z,Math.sin(walkPhase)*(.045+runBlend*.025)*walkBlend,9,dt);
+ torsoRig.rotation.x=smooth(torsoRig.rotation.x,airborne?(rising?-.10:.12):-.035*walkBlend,9,dt);
+ torsoRig.position.y=2.65+(airborne?-.07:Math.abs(Math.sin(walkPhase*2))*(.045+runBlend*.035)*walkBlend+Math.sin(idlePhase*1.8)*.018*(1-walkBlend));
+ headRig.rotation.x=smooth(headRig.rotation.x,airborne?(rising?-.08:.10):Math.sin(idlePhase*1.4)*.018,8,dt);
+ if(previousAirborne&&!airborne)landPulse=.16;
+ previousAirborne=airborne;
+ landPulse=Math.max(0,landPulse-dt);
+ const squash=landPulse>0?Math.sin((.16-landPulse)/.16*Math.PI)*.075:0;
+ avatar.scale.set(1+squash*.35,1-squash,1+squash*.35);
  state.vy-=25*dt;state.y+=state.vy*dt;
  if(state.y<=0){state.y=0;state.vy=0;state.grounded=true}
  avatar.position.set(state.x,state.y,state.z);avatar.rotation.y=state.yaw;
@@ -365,7 +381,8 @@ function update(dt){
  if(!state.cameraReady){camera.position.copy(desired);state.cameraReady=true}
  else camera.position.lerp(desired,1-Math.exp(-8*dt));
  camera.lookAt(target);
- document.getElementById('status').textContent=localPlayerName+' · R6';
+ const motionLabel=airborne?(rising?'Saltando':'Cayendo'):(horizontalSpeed>.35?(running?'Corriendo':'Caminando'):'En reposo');
+ document.getElementById('status').textContent=localPlayerName+' · R6 · '+motionLabel;
 }
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
 animate();
