@@ -186,13 +186,31 @@ main{position:absolute;inset:0}
  const details=document.getElementById('avatarDetails');
  let searchTimer=0,searchController=null,selectedUser=null,requestVersion=0;
  const cleanName=value=>value.trim().replace(/^@/,'');
+ const apiCache=new Map();
+ const CACHE_TTL=path=>path.startsWith('/v1/users/search')?3*60*1000:30*60*1000;
  async function requestJson(path,options={}){
-  // Roblox no habilita CORS para estas APIs. El proxy solo reenvía GET públicos.
+  // Cachea GET públicos para no repetir consultas y reducir respuestas 429.
   if((options.method||'GET').toUpperCase()!=='GET')throw new Error('Esta consulta requiere GET.');
-  const url='https://proxy.cors.dev/https://'+(path.startsWith('/v4/avatar')?'avatar':path.startsWith('/v1/users/avatar')?'thumbnails':'users')+'.roblox.com'+path;
+  const cached=apiCache.get(path);
+  if(cached&&Date.now()-cached.time<CACHE_TTL(path))return cached.data;
+  const storageKey='tahu-roblox-api:'+path;
+  try{
+   const stored=JSON.parse(localStorage.getItem(storageKey)||'null');
+   if(stored&&Date.now()-stored.time<CACHE_TTL(path)){apiCache.set(path,stored);return stored.data;}
+  }catch(_){}
+  const host=path.startsWith('/v4/avatar')?'avatar':path.startsWith('/v1/users/avatar')?'thumbnails':'users';
+  const url='https://proxy.cors.dev/https://'+host+'.roblox.com'+path;
   const response=await fetch(url,{method:'GET',signal:options.signal,headers:{Accept:'application/json'}});
+  if(response.status===429){
+   const retry=response.headers.get('Retry-After');
+   const wait=retry&&/^\\d+$/.test(retry)?' Roblox pide esperar '+retry+' segundos.':'';
+   throw new Error('Roblox está limitando temporalmente las consultas (HTTP 429).'+wait+' Espera un poco antes de volver a intentarlo.');
+  }
   if(!response.ok)throw new Error('El servicio de Roblox respondió HTTP '+response.status+'.');
-  return response.json();
+  const data=await response.json();
+  const entry={time:Date.now(),data};apiCache.set(path,entry);
+  try{localStorage.setItem(storageKey,JSON.stringify(entry));}catch(_){}
+  return data;
  }
  function hideSuggestions(){suggestions.style.display='none';suggestions.replaceChildren();}
  function renderSuggestions(users){
@@ -213,14 +231,20 @@ main{position:absolute;inset:0}
   selectedUser=null;const value=cleanName(input.value);
   clearTimeout(searchTimer);if(searchController)searchController.abort();
   if(value.length<2){hideSuggestions();return;}
+  if(value.length<3){hideSuggestions();return;}
   searchTimer=setTimeout(async()=>{
    searchController=new AbortController();
    try{
     const data=await requestJson('/v1/users/search?keyword='+encodeURIComponent(value)+'&limit=8',{signal:searchController.signal});
     if(cleanName(input.value)!==value)return;
     renderSuggestions((data.data||[]).slice(0,8));
-   }catch(error){if(error.name!=='AbortError')hideSuggestions();}
-  },280);
+   }catch(error){
+    if(error.name!=='AbortError'){
+     hideSuggestions();
+     if(error.message&&error.message.includes('HTTP 429'))message.textContent=error.message;
+    }
+   }
+  },650);
  });
  input.addEventListener('keydown',e=>{
   if(e.key==='Escape')hideSuggestions();
@@ -243,6 +267,7 @@ main{position:absolute;inset:0}
    }
    if(!user)throw new Error('No se encontró una coincidencia exacta para @'+username+'. Comprueba el nombre o elige una sugerencia.');
    const userId=user.id;
+   message.textContent='Cargando apariencia y miniatura…';
    const [appearanceResult,thumbResult]=await Promise.allSettled([
     requestJson('/v4/avatar/users/'+userId),
     requestJson('/v1/users/avatar?userIds='+userId+'&size=420x420&format=Png&isCircular=false')
