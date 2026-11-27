@@ -25,9 +25,9 @@ main{position:relative;flex:1;min-height:0;background:#83c9ed}
 .game-title{font-size:16px;font-weight:900}.game-title span{color:var(--orange)}
 .hint{margin-top:5px;color:#d4e4eb;font-size:12px;line-height:1.5}
 .status{font-size:12px;color:#e8f4fa;text-align:right}
-#help{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100% - 34px));padding:24px;text-align:center;background:#101820ed;border:1px solid #ffffff45;border-radius:16px;box-shadow:0 20px 70px #0005}
-#help h1{font-size:28px;margin:0 0 9px}#help h1 span{color:var(--orange)}
-#help p{color:#d2e0e7;line-height:1.55;margin:0 0 17px}
+#help{position:absolute;z-index:3;left:50%;top:82px;transform:translateX(-50%);width:min(390px,calc(100% - 34px));padding:15px;text-align:center;background:#101820ed;border:1px solid #ffffff45;border-radius:16px;box-shadow:0 20px 70px #0005}
+#help h1{font-size:23px;margin:0 0 7px}#help h1 span{color:var(--orange)}
+#help p{color:#d2e0e7;line-height:1.45;margin:0 0 10px}
 #start{border:0;border-radius:8px;background:var(--orange);color:#111;font-size:15px;font-weight:900;padding:12px 24px;cursor:pointer}
 #start:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .controls{position:absolute;z-index:3;inset:auto 16px 16px;display:flex;justify-content:space-between;align-items:end;pointer-events:none}
@@ -74,7 +74,7 @@ const mount=document.getElementById('game');
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87ceeb);
 scene.fog=new THREE.Fog(0x87ceeb,95,190);
-const camera=new THREE.PerspectiveCamera(65,1,.1,350);
+const camera=new THREE.PerspectiveCamera(65,1,.1,350);\ncamera.position.set(0,7.5,12);\ncamera.lookAt(0,2.7,0);
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
@@ -132,7 +132,7 @@ spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.22,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0};
 const clock=new THREE.Clock();
 function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
-new ResizeObserver(resize).observe(mount);resize();
+new ResizeObserver(resize).observe(mount);resize();\n// La cámara ya muestra el avatar desde la primera imagen, incluso antes de pulsar JUGAR.
 
 function keyName(k){return k.toLowerCase()}
 window.addEventListener('keydown',e=>{const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
