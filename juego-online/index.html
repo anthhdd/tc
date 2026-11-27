@@ -138,7 +138,7 @@ spawnPad.position.set(0,.1,0);spawnPad.receiveShadow=true;scene.add(spawnPad);
 const spawnMark=new THREE.Mesh(new THREE.BoxGeometry(2,.04,2),new THREE.MeshStandardMaterial({color:0xff9000,emissive:0x552000}));
 spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 
-const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.22,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0};
+const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.18,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0,cameraReady:false};
 const clock=new THREE.Clock();
 function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
 new ResizeObserver(resize).observe(mount);resize();
@@ -156,12 +156,12 @@ for(const [id,key] of [['forward','w'],['back','s'],['left','a'],['right','d']])
  const end=()=>{state.touch[key]=false;el.classList.remove('down')};
  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('lostpointercapture',end);
 }
-renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button===0){state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)}});
-renderer.domElement.addEventListener('pointermove',e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.camYaw-=dx*.006;state.camPitch=Math.max(-.05,Math.min(.8,state.camPitch+dy*.004))});
+renderer.domElement.addEventListener('pointerdown',e=>{if((e.pointerType==='mouse'&&e.button===0)||e.pointerType==='touch'){state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)}});
+renderer.domElement.addEventListener('pointermove',e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.camYaw-=dx*.005;state.camPitch=Math.max(-.15,Math.min(.65,state.camPitch+dy*.003))});
 renderer.domElement.addEventListener('pointerup',()=>state.drag=false);
 renderer.domElement.addEventListener('pointercancel',()=>state.drag=false);
 renderer.domElement.addEventListener('wheel',e=>{camera.userData.distance=Math.max(6,Math.min(18,(camera.userData.distance||10)+e.deltaY*.01))},{passive:true});
-camera.userData.distance=10;
+camera.userData.distance=12;
 
 function update(dt){
  if(!state.started)return;
@@ -185,8 +185,11 @@ function update(dt){
  const dist=camera.userData.distance||10;
  const target=new THREE.Vector3(state.x, state.y+2.7, state.z);
  const horizontal=Math.cos(state.camPitch)*dist;
- const desired=new THREE.Vector3(target.x+Math.sin(state.camYaw)*horizontal,target.y+Math.sin(state.camPitch)*dist+1.5,target.z+Math.cos(state.camYaw)*horizontal);
- camera.position.lerp(desired,1-Math.pow(.001,dt));camera.lookAt(target);
+ const desired=new THREE.Vector3(target.x+Math.sin(state.camYaw)*horizontal,target.y+Math.sin(state.camPitch)*dist,target.z+Math.cos(state.camYaw)*horizontal);
+ // Coloca la cámara en su órbita exacta al empezar y después aplica suavizado estable.
+ if(!state.cameraReady){camera.position.copy(desired);state.cameraReady=true}
+ else camera.position.lerp(desired,1-Math.exp(-8*dt));
+ camera.lookAt(target);
  document.getElementById('status').innerHTML='Modo 3D · Avatar R6<br>'+Math.round(state.x)+' , '+Math.round(state.z);
 }
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);update(dt);renderer.render(scene,camera)}
