@@ -384,17 +384,20 @@ window.addEventListener('tahu-avatar-loaded',e=>{
  const rightLegColor=colors.rightLegColorId??colors.leftLegColorId;
  const armLeft=leftArm.children.find(o=>o.isMesh),armRight=rightArm.children.find(o=>o.isMesh);
  const legLeft=leftLeg.children.find(o=>o.isMesh),legRight=rightLeg.children.find(o=>o.isMesh);
- if(armLeft)armLeft.material.color.setHex(colorFor(leftArmColor));
- if(armRight)armRight.material.color.setHex(colorFor(rightArmColor));
- if(legLeft)legLeft.material.color.setHex(colorFor(leftLegColor));
- if(legRight)legRight.material.color.setHex(colorFor(rightLegColor));
+ if(armLeft){armLeft.material=skin.clone();armLeft.material.color.setHex(colorFor(leftArmColor));}
+ if(armRight){armRight.material=skin.clone();armRight.material.color.setHex(colorFor(rightArmColor));}
  // La ropa clásica del avatar se refleja en las piezas R6; el perfil aporta los objetos y tipos.
  const assets=Array.isArray(appearance.assets)?appearance.assets:[];
  const clothing=assets.map(a=>(a.assetType&&a.assetType.name||'').toLowerCase());
  const hasClassicShirt=clothing.some(x=>x==='shirt');
  const hasClassicPants=clothing.some(x=>x==='pants');
- shirt.color.setHex(hasClassicShirt?0x777777:0xff8a00);
- pants.color.setHex(hasClassicPants?0x555b70:0x263c73);
+ if(hasClassicShirt)shirt.color.setHex(0x777777);
+ else setMat(shirt,colors.torsoColorId);
+ if(hasClassicPants)pants.color.setHex(0x263c73);
+ else {
+  if(legLeft){legLeft.material=skin.clone();legLeft.material.color.setHex(colorFor(leftLegColor));}
+  if(legRight){legRight.material=skin.clone();legRight.material.color.setHex(colorFor(rightLegColor));}
+ }
  clearAccessories();
  const accessoryAssets=assets.filter(a=>/accessory|hat|hair|face/i.test((a.name||'')+' '+(a.assetType&&a.assetType.name||''))).slice(0,6);
  accessoryAssets.forEach((item,index)=>{
