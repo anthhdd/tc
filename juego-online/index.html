@@ -71,11 +71,20 @@ footer{height:25px;flex:none;background:#080808;border-top:1px solid #292929;col
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 const mount=document.getElementById('game');
+const startButton=document.getElementById('start');
+startButton.disabled=true;
+startButton.textContent='CARGANDO…';
+startButton.style.opacity='.7';
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x87ceeb);
 scene.fog=new THREE.Fog(0x87ceeb,95,190);
-const camera=new THREE.PerspectiveCamera(65,1,.1,350);\ncamera.position.set(0,7.5,12);\ncamera.lookAt(0,2.7,0);
+const camera=new THREE.PerspectiveCamera(65,1,.1,350);
+camera.position.set(0,7.5,12);
+camera.lookAt(0,2.7,0);
 const renderer=new THREE.WebGLRenderer({antialias:true});
+startButton.disabled=false;
+startButton.textContent='¡JUGAR!';
+startButton.style.opacity='1';
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -132,7 +141,8 @@ spawnMark.position.set(0,.21,0);scene.add(spawnMark);
 const state={x:0,z:0,y:0,vy:0,grounded:true,yaw:0,camYaw:0,camPitch:.22,keys:{},touch:{},started:false,drag:false,lastX:0,lastY:0};
 const clock=new THREE.Clock();
 function resize(){const w=mount.clientWidth,h=mount.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
-new ResizeObserver(resize).observe(mount);resize();\n// La cámara ya muestra el avatar desde la primera imagen, incluso antes de pulsar JUGAR.
+new ResizeObserver(resize).observe(mount);resize();
+// La cámara ya muestra el avatar desde la primera imagen, incluso antes de pulsar JUGAR.
 
 function keyName(k){return k.toLowerCase()}
 window.addEventListener('keydown',e=>{const k=keyName(e.key);if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)){e.preventDefault();state.keys[k]=true;if(k===' ')jump()}});
