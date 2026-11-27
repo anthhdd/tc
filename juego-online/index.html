@@ -20,9 +20,44 @@ h1 span{color:var(--orange)}
 p{font-size:19px;line-height:1.6;color:#bbb;margin:0}
 footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#777;font-size:12px}
 .login{background:#292929;color:#fff;border:1px solid #555}.signup{background:var(--orange);color:#111}
+
+/* Movimiento y acabado visual */
+body{background:radial-gradient(ellipse at 50% -25%,#38200b 0%,#17120e 28%,var(--bg) 68%);background-attachment:fixed}
+header{position:relative;z-index:2;backdrop-filter:blur(14px);box-shadow:0 8px 30px #0005;animation:header-in .65s cubic-bezier(.2,.8,.2,1) both}
+.brand{transition:transform .25s ease,filter .25s ease}
+.brand:hover{transform:translateY(-2px);filter:drop-shadow(0 0 12px #ff900077)}
+.nav-button{position:relative;overflow:hidden;transition:transform .22s ease,box-shadow .22s ease,background .22s ease}
+.nav-button:hover{transform:translateY(-3px);box-shadow:0 7px 22px #ff900044}
+.nav-button:active{transform:translateY(0) scale(.97)}
+main{animation:content-in .8s .12s cubic-bezier(.2,.8,.2,1) both}
+.panel,.welcome{position:relative;overflow:hidden;animation:panel-in .85s .18s cubic-bezier(.2,.8,.2,1) both;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.panel:hover,.welcome:hover{transform:translateY(-4px);border-color:#87501d;box-shadow:0 24px 70px #0008,0 0 35px #ff900010}
+.panel:before,.welcome:before{content:"";position:absolute;inset:-1px;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#ffb9000c 48%,transparent 70%);transform:translateX(-100%);animation:shine 5s 1.2s ease-in-out infinite}
+h1 span{ text-shadow:0 0 26px #ff900044 }
+footer{animation:fade-in .9s .35s both}
+.age-dialog{animation:panel-in .55s cubic-bezier(.2,.8,.2,1) both}
+.age-actions button{transition:transform .2s ease,filter .2s ease}
+.age-actions button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+#site-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(ellipse at center,#241708 0%,#111 58%,#080808 100%);opacity:1;visibility:visible;transition:opacity .55s ease,visibility .55s ease}
+#site-loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+.loader-inner{display:flex;flex-direction:column;align-items:center;gap:22px}
+.loader-logo{font-size:clamp(34px,7vw,48px);font-weight:950;letter-spacing:-2px;color:#fff;animation:logo-pulse 1.25s ease-in-out infinite}
+.loader-logo span{background:var(--orange);color:#111;padding:5px 8px;border-radius:7px;margin-left:3px}
+.loader-ring{width:48px;height:48px;border:3px solid #ffffff1a;border-top-color:var(--orange);border-right-color:#ffb900;border-radius:50%;animation:spin .8s linear infinite;box-shadow:0 0 24px #ff900033}
+.loader-caption{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#9a8b7b}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes logo-pulse{0%,100%{filter:drop-shadow(0 0 4px #ff900022);transform:scale(1)}50%{filter:drop-shadow(0 0 18px #ff900088);transform:scale(1.035)}}
+@keyframes header-in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes content-in{from{opacity:0}to{opacity:1}}
+@keyframes panel-in{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes shine{0%,65%,100%{transform:translateX(-100%)}35%{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
+<div id="site-loader" role="status" aria-label="Cargando Tahu De Chill"><div class="loader-inner"><div class="loader-logo">tahu<span>de chill</span></div><div class="loader-ring"></div><div class="loader-caption">Preparando la diversión</div></div></div>
 <header>
 <a class="brand" href="../">tahu<span>de chill</span></a>
 <a class="nav-button" href="../games/">Juegos</a>
@@ -32,5 +67,8 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#77
 </header>
 <main><section class="panel"><h1><span>Juego online</span></h1><p>¡Próximamente podrás jugar en línea desde Tahu De Chill!</p></section></main>
 <footer>© 2026 Tahu De Chill</footer>
+<script>
+(()=>{const loader=document.getElementById('site-loader');if(!loader)return;const finish=()=>setTimeout(()=>loader.classList.add('hide'),650);if(document.readyState==='complete')finish();else window.addEventListener('load',finish,{once:true});})();
+</script>
 </body>
 </html>
