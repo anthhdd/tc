@@ -18,6 +18,14 @@ h1{font-size:clamp(34px,6vw,56px);margin:0 0 18px;font-weight:900;letter-spacing
 h1 span{color:var(--orange)}
 p{font-size:clamp(17px,2.5vw,21px);color:#bbb;margin:0}
 footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#777;font-size:12px}
+.age-overlay{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:20px;background:#000e}
+.age-dialog{width:min(100%,460px);padding:34px 28px;text-align:center;background:#191919;border:1px solid #493015;border-radius:12px;box-shadow:0 20px 70px #000b}
+.age-dialog h2{margin:0 0 12px;font-size:27px}.age-dialog h2 span{color:var(--orange)}
+.age-dialog p{font-size:16px;line-height:1.5;margin:0 0 24px}
+.age-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.age-actions button{border:0;border-radius:6px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer}
+#yes{background:var(--orange);color:#111}#no{background:#333;color:#fff}
+.age-actions button:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
 </style>
 </head>
 <body>
@@ -31,5 +39,24 @@ footer{border-top:1px solid var(--line);padding:20px;text-align:center;color:#77
   </section>
 </main>
 <footer>© 2026 Tahu De Chill</footer>
+
+<div class="age-overlay" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="ageTitle" aria-describedby="ageDescription">
+  <div class="age-dialog">
+    <h2 id="ageTitle">¿Tienes <span>18 años</span> o más?</h2>
+    <p id="ageDescription">Debes confirmar que tienes al menos 18 años para entrar en Tahu De Chill.</p>
+    <div class="age-actions">
+      <button id="yes" type="button">Sí, tengo 18 o más</button>
+      <button id="no" type="button">No, soy menor de 18</button>
+    </div>
+  </div>
+</div>
+<script>
+const gate=document.getElementById('ageGate');
+document.getElementById('yes').addEventListener('click',()=>{gate.remove();});
+document.getElementById('no').addEventListener('click',()=>{
+  document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#111;color:#eee;font:16px Arial,sans-serif;text-align:center"><div><h1 style="color:#ff9000">Acceso denegado</h1><p>Debes tener 18 años o más para entrar.</p>Puedes cerrar esta pestaña.</div></main>';
+  window.close();
+});
+</script>
 </body>
 </html>
